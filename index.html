@@ -31,24 +31,23 @@
             <a href="index.html">
                 <img src="logoprincipal.jpg" alt="Logo DPvPer" class="h-12">
             </a>
-            <a href="terapeuta-login.html" class="font-semibold text-gray-700 hover:text-[#E8A613] transition-colors">Acceso Terapeutas</a>
+            <!-- Menú de navegación (si se quisiera añadir más adelante) -->
         </div>
     </nav>
 
     <!-- SECCIÓN DE INTRODUCCIÓN (HERO) -->
-    <section class="text-center py-20 lg:py-32 px-6 bg-white">
+    <section id="hero-section" class="text-center py-20 lg:py-32 px-6 bg-white">
         <h1 class="text-4xl md:text-6xl font-bold mb-4">Descubre tu Propósito de Vida.</h1>
         <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8">La Escala DPvPer es una herramienta de autodescubrimiento diseñada para ayudarte a identificar tus impulsores internos y encontrar tu brújula personal. Descubre qué te mueve y cómo alinear tu vida con tu verdadera esencia.</p>
-        <a href="#cuestionario-wrapper" id="start-button" class="btn-brand text-lg">Iniciar Cuestionario</a>
+        <a href="#demographics-wrapper" id="start-button" class="btn-brand text-lg">Iniciar Diagnóstico</a>
     </section>
 
-    <!-- CONTENEDOR DEL CUESTIONARIO (INICIALMENTE OCULTO) -->
-    <div id="cuestionario-wrapper" class="hidden">
-        <main class="container mx-auto px-6 py-12">
-            <form id="dpvperForm">
-                <!-- SECCIÓN DE DATOS DEMOGRÁFICOS -->
-                <section id="demograficos" class="card mb-12">
-                    <h2 class="text-3xl mb-6 border-b pb-4">1. Comencemos por conocerte</h2>
+    <main class="container mx-auto px-6 py-12">
+        <form id="dpvperForm">
+            <!-- CONTENEDOR DE DATOS DEMOGRÁFICOS (INICIALMENTE OCULTO) -->
+            <div id="demographics-wrapper" class="hidden">
+                <section class="card mb-12">
+                    <h2 class="text-3xl mb-6 border-b pb-4">Paso 1: Comencemos por conocerte</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label for="nombre" class="font-medium block mb-2">Nombre Completo</label>
@@ -136,14 +135,20 @@
                             </select>
                         </div>
                     </div>
+                    <div id="demographics-validation" class="text-red-600 text-center mt-4 hidden">Por favor, completa todos los campos.</div>
+                    <div class="text-center mt-6">
+                        <button type="button" id="continue-to-questions" class="btn-brand">Continuar a las preguntas</button>
+                    </div>
                 </section>
+            </div>
 
-                <!-- SECCIÓN DEL CUESTIONARIO -->
+            <!-- CONTENEDOR DEL CUESTIONARIO (INICIALMENTE OCULTO) -->
+            <div id="cuestionario-wrapper" class="hidden">
                 <section id="cuestionario">
-                    <h2 class="text-3xl mb-2 border-b pb-4">2. Exploremos tu mundo interior</h2>
+                    <h2 class="text-3xl mb-2 border-b pb-4">Paso 2: Exploremos tu mundo interior</h2>
                     <p class="mt-4 mb-6 text-base">A continuación, encontrarás 12 preguntas de selección. Elige la opción que más resuene contigo de forma intuitiva, sin pensarlo demasiado. Este cuestionario no te tomará más de 5 minutos.</p>
                     
-                    <!-- PREGUNTAS 1-12 (idénticas a la versión anterior) -->
+                    <!-- PREGUNTAS 1-12 -->
                     <!-- PREGUNTA 1 -->
                     <div class="card question-card">
                         <h3 class="text-xl mb-4">1. Cuando te sientes en tu elemento, completamente absorto y lleno de energía, generalmente estás...</h3>
@@ -156,7 +161,8 @@
                             <input type="radio" name="q1" id="q1f" value="f"><label for="q1f" class="option-label">f) En un espacio de calma, reflexionando, meditando o conectando con tu interior.</label>
                         </div>
                     </div>
-
+                    
+                    <!-- Las preguntas 2 a 12 son idénticas y se omiten por brevedad -->
                     <!-- PREGUNTA 2 -->
                     <div class="card question-card">
                         <h3 class="text-xl mb-4">2. ¿Cuál de estos valores es tu "no negociable" fundamental en la vida? Si tuvieras que elegir solo uno como tu pilar principal, sería...</h3>
@@ -300,37 +306,36 @@
                         </div>
                     </div>
 
-                </section>
-                
-                <!-- CAPTCHA Y POLÍTICAS -->
-                <div class="card mt-8">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                        <div>
-                            <label for="captcha" class="font-medium block mb-2">Prueba de seguridad</label>
-                            <div class="flex items-center space-x-4">
-                                <span id="captcha-question" class="text-lg"></span>
-                                <input type="number" id="captcha-answer" class="input-styled w-24" required>
+                    <!-- CAPTCHA Y POLÍTICAS -->
+                    <div class="card mt-8">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <label for="captcha" class="font-medium block mb-2">Prueba de seguridad</label>
+                                <div class="flex items-center space-x-4">
+                                    <span id="captcha-question" class="text-lg"></span>
+                                    <input type="number" id="captcha-answer" class="input-styled w-24" required>
+                                </div>
                             </div>
-                        </div>
-                        <div>
-                            <div class="flex items-start">
-                                <input id="politicas" name="politicas" type="checkbox" class="h-4 w-4 text-[#E8A613] focus:ring-[#d4940f] border-gray-300 rounded mt-1">
-                                <div class="ml-3 text-sm">
-                                    <label for="politicas" class="text-gray-600">He leído y acepto la <a href="#" class="font-medium text-[#E8A613] hover:underline">política de privacidad y tratamiento de datos</a>.</label>
+                            <div>
+                                <div class="flex items-start">
+                                    <input id="politicas" name="politicas" type="checkbox" class="h-4 w-4 text-[#E8A613] focus:ring-[#d4940f] border-gray-300 rounded mt-1" required>
+                                    <div class="ml-3 text-sm">
+                                        <label for="politicas" class="text-gray-600">He leído y acepto la <a href="#" class="font-medium text-[#E8A613] hover:underline">política de privacidad y tratamiento de datos</a>.</label>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                <div id="validation-message" class="text-red-600 text-center my-4 hidden">Por favor, responde todas las preguntas, completa la prueba de seguridad y acepta las políticas antes de continuar.</div>
-                
-                <div class="text-center mt-8">
-                    <button id="submit-button" type="submit" class="btn-brand text-lg" disabled>Finalizar y Ver mis Resultados</button>
-                </div>
-            </form>
-        </main>
-    </div>
+                    <div id="validation-message" class="text-red-600 text-center my-4 hidden">Por favor, responde todas las preguntas, completa la prueba de seguridad y acepta las políticas antes de continuar.</div>
+                    
+                    <div class="text-center mt-8">
+                        <button id="submit-button" type="submit" class="btn-brand text-lg">Finalizar y Ver mis Resultados</button>
+                    </div>
+                </section>
+            </div>
+        </form>
+    </main>
 
     <!-- BANNER DE COOKIES -->
     <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 bg-gray-800 text-white p-4 flex justify-between items-center z-30 hidden">
@@ -340,50 +345,67 @@
 
     <!-- FOOTER -->
     <footer class="bg-[#070404] text-white py-12">
-        <div class="container mx-auto text-center">
+        <div class="container mx-auto text-center px-6">
             <p class="text-gray-400">&copy; 2025 Jorge Arango Castaño - DPvPer.</p>
+            <a href="terapeuta-login.html" class="text-sm text-gray-400 hover:text-white transition-colors mt-2 inline-block">Acceso Terapeutas</a>
         </div>
     </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const startButton = document.getElementById('start-button');
+            const demographicsWrapper = document.getElementById('demographics-wrapper');
+            const continueButton = document.getElementById('continue-to-questions');
             const questionnaireWrapper = document.getElementById('cuestionario-wrapper');
             const form = document.getElementById('dpvperForm');
-            const validationMessage = document.getElementById('validation-message');
             const submitButton = document.getElementById('submit-button');
             
+            // Lógica para iniciar el diagnóstico
+            startButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                demographicsWrapper.classList.remove('hidden');
+                document.querySelector(startButton.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+
+            // Lógica para continuar a las preguntas
+            continueButton.addEventListener('click', () => {
+                const demographicsForm = demographicsWrapper.querySelector('section');
+                const inputs = demographicsForm.querySelectorAll('input, select');
+                let allFilled = true;
+                inputs.forEach(input => {
+                    if (!input.value) {
+                        allFilled = false;
+                        input.classList.add('border-red-500');
+                    } else {
+                         input.classList.remove('border-red-500');
+                    }
+                });
+
+                const validationDiv = document.getElementById('demographics-validation');
+                if (allFilled) {
+                    validationDiv.classList.add('hidden');
+                    demographicsWrapper.classList.add('hidden');
+                    questionnaireWrapper.classList.remove('hidden');
+                    questionnaireWrapper.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    validationDiv.classList.remove('hidden');
+                }
+            });
+
             // Lógica del Captcha
             const captchaQuestion = document.getElementById('captcha-question');
             const captchaAnswer = document.getElementById('captcha-answer');
             const politicasCheckbox = document.getElementById('politicas');
             let captchaResult;
-
             function generateCaptcha() {
                 const num1 = Math.floor(Math.random() * 10) + 1;
                 const num2 = Math.floor(Math.random() * 10) + 1;
                 captchaResult = num1 + num2;
                 captchaQuestion.textContent = `¿Cuánto es ${num1} + ${num2}?`;
             }
-
-            // Lógica de validación para activar el botón
-            function validateFormState() {
-                const captchaCorrect = parseInt(captchaAnswer.value, 10) === captchaResult;
-                const politicasAccepted = politicasCheckbox.checked;
-                submitButton.disabled = !(captchaCorrect && politicasAccepted);
-            }
-
-            captchaAnswer.addEventListener('input', validateFormState);
-            politicasCheckbox.addEventListener('change', validateFormState);
-            
-            // Lógica para iniciar el cuestionario
-            startButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                questionnaireWrapper.classList.remove('hidden');
-                document.querySelector(startButton.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
-            });
+            generateCaptcha();
 
             // Lógica del banner de cookies
             const cookieBanner = document.getElementById('cookie-banner');
@@ -399,17 +421,20 @@
             // Lógica de envío del formulario
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
+                submitButton.disabled = true;
 
-                let allAnswered = true;
+                let allQuestionsAnswered = true;
                 for (let i = 1; i <= 12; i++) {
                     if (!form.elements[`q${i}`].value) {
-                        allAnswered = false;
+                        allQuestionsAnswered = false;
                         break;
                     }
                 }
 
-                if (!allAnswered || !politicasCheckbox.checked || parseInt(captchaAnswer.value, 10) !== captchaResult) {
+                const validationMessage = document.getElementById('validation-message');
+                if (!allQuestionsAnswered || !politicasCheckbox.checked || parseInt(captchaAnswer.value, 10) !== captchaResult) {
                     validationMessage.classList.remove('hidden');
+                    submitButton.disabled = false;
                     return;
                 }
                 validationMessage.classList.add('hidden');
@@ -462,8 +487,6 @@
                     submitButton.textContent = 'Finalizar y Ver mis Resultados';
                 }
             });
-            
-            generateCaptcha();
         });
     </script>
 </body>
