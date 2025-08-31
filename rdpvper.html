@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resultados Preliminares DPvPer - Caminos del Ser</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #F8F7F2; color: #6B6661; }
+        h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: #070404; }
+        .btn-brand { background-color: #E8A613; color: white; padding: 12px 30px; border-radius: 9999px; font-weight: 600; transition: all 0.3s ease; }
+        .btn-brand:hover { background-color: #d4940f; transform: translateY(-2px); }
+        .card { background-color: white; border-radius: 16px; padding: 2rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+    </style>
+</head>
+<body class="leading-relaxed">
+
+    <header class="bg-white py-4 shadow-sm">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <a href="index.html">
+                <img src="logoprincipal.png" alt="Logo DPvPer" class="h-12">
+            </a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="https://caminosdelser.co" class="text-gray-600 hover:text-[#E8A613]">Inicio</a>
+                <a href="BaseTeorica_PI.pdf" target="_blank" class="text-gray-600 hover:text-[#E8A613]">Base Teórica</a>
+                <a href="https://wa.me/573233796547" target="_blank" class="text-gray-600 hover:text-[#E8A613]">Contacto</a>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="container mx-auto px-6 py-12">
+        <!-- VISTA PRELIMINAR PARA EL USUARIO -->
+        <div id="vistaPublica">
+            <!-- El contenido se generará dinámicamente con JavaScript -->
+            <div class="text-center py-20">
+                <h1 class="text-3xl">Cargando tus resultados...</h1>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-[#070404] text-white py-12">
+        <div class="container mx-auto text-center px-6">
+            <p class="text-gray-400">&copy; 2025 Jorge Arango Castaño - DPvPer.</p>
+            <a href="terapeuta-login.html" class="text-sm text-gray-400 hover:text-white transition-colors mt-2 inline-block">Acceso Terapeutas</a>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sessionData = sessionStorage.getItem('dpvperResultados');
+            const mainContent = document.getElementById('main-content');
+
+            if (!sessionData) {
+                mainContent.innerHTML = '<div class="text-center py-20"><h1 class="text-3xl text-red-600">No se encontraron resultados.</h1><p class="mt-4">Por favor, completa primero el cuestionario.</p><a href="index.html" class="btn-brand mt-6 inline-block">Ir al Cuestionario</a></div>';
+                return;
+            }
+
+            try {
+                const datosCompletos = JSON.parse(sessionData);
+                procesarResultados(datosCompletos);
+            } catch (e) {
+                console.error("Error al procesar los datos:", e);
+                mainContent.innerHTML = '<h1 class="text-3xl text-center text-red-600">Hubo un error al procesar tus resultados.</h1>';
+            }
+        });
+
+        function procesarResultados(datosCompletos) {
+            const respuestas = datosCompletos.respuestas;
+            const demograficos = datosCompletos.demograficos;
+
+            const arquetiposInfo = {
+                a: { nombre: 'Analista / Sabio', descripcion: 'Tu motor es el conocimiento, la lógica y la búsqueda de la verdad. Encuentras sentido al entender el mundo, organizar sistemas y resolver problemas complejos. Tu camino es el de la sabiduría y la claridad.' },
+                b: { nombre: 'Creador / Innovador', descripcion: 'Tu energía proviene de la imaginación, la originalidad y la necesidad de dar forma a lo nuevo. Te sientes más vivo/a cuando creas, inventas o expresas una visión única. Tu propósito se encuentra en el acto de la creación.' },
+                c: { nombre: 'Conector / Humanista', descripcion: 'Encuentras tu propósito en la red de relaciones humanas. Tu fuerza radica en la empatía, en construir puentes entre personas y en fomentar la comunidad. Te nutres al ayudar a otros a crecer y prosperar juntos.' },
+                d: { nombre: 'Explorador', descripcion: 'Te impulsa un profundo anhelo de libertad, autonomía y nuevas experiencias. Tu propósito no es un destino, sino el viaje mismo: aprender, descubrir y expandir constantemente tus horizontes sin ataduras.' },
+                e: { nombre: 'Constructor / Contribuidor', descripcion: 'Tu motivación es el impacto tangible y el servicio a una causa más grande que tú. Eres una persona de acción que encuentra sentido al edificar, aportar de forma práctica y dejar un legado duradero que mejore el mundo.' },
+                f: { nombre: 'Sanador / Espiritual', descripcion: 'Tu energía se dirige hacia el mundo interior. Buscas la armonía, el equilibrio y la paz, tanto para ti como para los demás. Tu propósito se manifiesta al guiar a otros hacia el bienestar y la conexión con su esencia.' }
+            };
+
+            const scores = { a: 0, b: 0, c: 0, d: 0, e: 0, f: 0 };
+            for (const pregunta in respuestas) {
+                const arquetipoVotado = respuestas[pregunta];
+                if (arquetipoVotado !== 'na') {
+                    scores[arquetipoVotado]++;
+                }
+            }
+
+            const sortedScores = Object.entries(scores).sort(([,a],[,b]) => b-a);
+            
+            const arquetipoPrimario = sortedScores[0];
+            const arquetipoSecundario = sortedScores[1];
+
+            mostrarVistaPublica(demograficos, scores, arquetipoPrimario, arquetipoSecundario, arquetiposInfo);
+        }
+
+        function mostrarVistaPublica(demograficos, scores, primario, secundario, info) {
+            const vistaPublicaDiv = document.getElementById('vistaPublica');
+            
+            const nombrePrimario = info[primario[0]].nombre;
+            const descPrimario = info[primario[0]].descripcion;
+            const nombreSecundario = info[secundario[0]].nombre;
+            const descSecundario = info[secundario[0]].descripcion;
+
+            let html = `
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-5xl">Hola, ${demograficos.nombre.split(' ')[0]}</h1>
+                    <p class="text-lg mt-2">Estos son los resultados preliminares de tu diagnóstico DPvPer.</p>
+                </div>
+
+                <div class="card mt-10">
+                    <h2 class="text-3xl text-center mb-8">Tu Perfil Arquetípico Dominante</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                        <div class="chart-container" style="height: 350px; max-height: 400px;">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                        <div>
+                            <h3 class="text-2xl font-bold text-[#0077B6]">Arquetipo Primario: ${nombrePrimario}</h3>
+                            <p class="mt-2 mb-6">${descPrimario}</p>
+                            <h3 class="text-2xl font-bold text-[#03045E]">Arquetipo Secundario: ${nombreSecundario}</h3>
+                            <p class="mt-2">${descSecundario}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-10 text-center bg-[#070404] text-white">
+                    <h2 class="text-3xl text-[#E8A613]">Este es solo el comienzo de tu viaje.</h2>
+                    <p class="mt-4 max-w-2xl mx-auto">Has descubierto tus dos fuerzas motrices principales. Sin embargo, el reporte completo analiza la interacción de todos tus arquetipos, revela tus bloqueos específicos y te entrega una "Fórmula de Propósito" personalizada para que puedas empezar a construir proyectos de vida alineados con tu esencia.</p>
+                    <a href="https://wa.me/573233796547" target="_blank" class="btn-brand mt-8 inline-block">Contactar para recibir mi reporte completo</a>
+                </div>
+            `;
+
+            vistaPublicaDiv.innerHTML = html;
+
+            // Renderizar el gráfico
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: Object.values(info).map(a => a.nombre.split(' / ')[0]),
+                    datasets: [{
+                        label: 'Tu Puntuación',
+                        data: Object.values(scores),
+                        backgroundColor: 'rgba(232, 166, 19, 0.2)',
+                        borderColor: '#E8A613',
+                        pointBackgroundColor: '#E8A613',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#E8A613'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                            pointLabels: { font: { size: 12 }, color: '#6B6661' },
+                            ticks: { display: false, stepSize: 2 },
+                            suggestedMin: 0,
+                            suggestedMax: Math.max(...Object.values(scores)) + 1
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+
