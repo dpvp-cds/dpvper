@@ -537,7 +537,7 @@
                     let isValid = true;
                     if (!input.value) isValid = false;
                     if (input.type === 'email' && !emailRegex.test(input.value)) isValid = false;
-                    if (input.type === 'number' && input.value < 15) isValid = false;
+                    if (input.type === 'number' && input.id === 'edad' && input.value < 15) isValid = false;
 
                     if (!isValid) {
                         allFilled = false;
