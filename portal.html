@@ -47,14 +47,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Seguridad simple: si no está logueado, lo saca.
             if (sessionStorage.getItem('terapeutaAuth') !== 'true') {
                 window.location.href = 'terapeuta-login.html';
                 return;
             }
-
             fetchReportes();
-
             document.getElementById('logoutButton').addEventListener('click', () => {
                 sessionStorage.removeItem('terapeutaAuth');
                 window.location.href = 'terapeuta-login.html';
@@ -64,13 +61,9 @@
         async function fetchReportes() {
             const loadingDiv = document.getElementById('loading');
             const reportListDiv = document.getElementById('report-list');
-
             try {
-                // Llamada a la nueva función de API para obtener los reportes
                 const response = await fetch('/api/get-reportes');
-                if (!response.ok) {
-                    throw new Error('No se pudo obtener la lista de reportes.');
-                }
+                if (!response.ok) throw new Error('No se pudo obtener la lista de reportes.');
                 const reportes = await response.json();
 
                 if (reportes.length === 0) {
@@ -80,19 +73,19 @@
                 
                 let html = '<div class="divide-y divide-gray-200">';
                 reportes.forEach(reporte => {
-                    // Convertir la fecha de Firebase a un formato legible
                     const fecha = new Date(reporte.fecha._seconds * 1000).toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' });
-                    
                     html += `
-                        <a href="./reporte-personal.html?id=${reporte.id}" class="report-item block p-4">
-                            <div class="flex justify-between items-center">
+                        <div class="report-item p-4 flex justify-between items-center">
+                            <a href="./reporte-personal.html?id=${reporte.id}" class="flex-grow">
                                 <div>
                                     <p class="font-bold text-lg text-[#070404]">${reporte.demograficos.nombre}</p>
                                     <p class="text-sm text-gray-500">Fecha: ${fecha}</p>
                                 </div>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                            </div>
-                        </a>
+                            </a>
+                            <button onclick="deleteReport('${reporte.id}', this)" class="ml-4 bg-red-100 text-red-700 text-xs font-bold py-1 px-3 rounded-full hover:bg-red-200 transition-colors">
+                                Eliminar
+                            </button>
+                        </div>
                     `;
                 });
                 html += '</div>';
@@ -106,6 +99,32 @@
                 loadingDiv.textContent = 'Error al cargar los reportes.';
             }
         }
+
+        async function deleteReport(id, buttonElement) {
+            if (!confirm('¿Estás seguro de que deseas eliminar este reporte de forma permanente? Esta acción no se puede deshacer.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/eliminar-reporte?id=${id}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    const reportItem = buttonElement.closest('.report-item');
+                    reportItem.style.transition = 'opacity 0.5s ease';
+                    reportItem.style.opacity = '0';
+                    setTimeout(() => reportItem.remove(), 500);
+                } else {
+                    const errorData = await response.json();
+                    alert(`Error al eliminar el reporte: ${errorData.message}`);
+                }
+            } catch (error) {
+                console.error('Error de red al eliminar:', error);
+                alert('Hubo un error de conexión al intentar eliminar el reporte.');
+            }
+        }
     </script>
 </body>
 </html>
+
