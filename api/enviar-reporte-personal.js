@@ -56,7 +56,7 @@ export default async function handler(req, res) {
 
         const docRef = await db.collection('reportes_dpvper').add(datosCompletos);
 
-        const resend = new Resend(process.env.RESEND_API_KEY);
+        const resend = new Resend(process.env.RESEND2_API_KEY);
         const pdfBuffer = await crearPDF(datosCompletos);
 
         await resend.emails.send({
@@ -80,4 +80,5 @@ export default async function handler(req, res) {
         res.status(500).json({ message: 'Error interno del servidor.' });
     }
 }
+
 
