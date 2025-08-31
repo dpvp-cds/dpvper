@@ -23,7 +23,7 @@ async function crearPDF(datos) {
     page.drawText('Resultados de Arquetipos:', { x: 50, y, font: boldFont, size: 16 });
     y -= 25;
 
-    // Lógica para calcular arquetipos (simplificada para el PDF)
+    // Lógica para calcular arquetipos
     const scores = { a: 0, b: 0, c: 0, d: 0, e: 0, f: 0 };
     for (const pregunta in datos.respuestas) {
         const arquetipoVotado = datos.respuestas[pregunta];
@@ -55,7 +55,7 @@ export default async function handler(req, res) {
         const datosCompletos = req.body;
         datosCompletos.fecha = new Date();
 
-        // 1. Guardar en Firebase (esto ya lo teníamos)
+        // 1. Guardar en Firebase
         const docRef = await db.collection('reportes_dpvper').add(datosCompletos);
 
         // 2. Enviar Correo con Resend
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
         await resend.emails.send({
           from: 'DPvPer Diagnóstico <diagnostico@caminosdelser.co>', // DEBE SER UN DOMINIO VERIFICADO EN RESEND
           to: datosCompletos.demograficos.email,
-          bcc: 'jorge.arango.castano@gmail.com', // Tu correo para recibir copia
+          bcc: 'dpvp.cds@emcotic.com', // TU NUEVO CORREO PARA RECIBIR COPIA
           subject: `Resultados de tu Diagnóstico DPvPer - ${datosCompletos.demograficos.nombre}`,
           html: `<h1>Hola ${datosCompletos.demograficos.nombre.split(' ')[0]},</h1><p>Gracias por completar la Escala DPvPer.</p><p>Adjunto encontrarás un resumen en PDF con tus puntuaciones de arquetipos. Para un análisis completo y descubrir tu fórmula de propósito, te invito a agendar una cita.</p><p>Un saludo,<br>Jorge Arango Castaño</p>`,
           attachments: [
