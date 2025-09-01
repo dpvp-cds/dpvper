@@ -77,7 +77,7 @@ export default async function handler(request, response) {
         
         console.log(`Enviando correo a ${datosCompletos.demograficos.email} y copia a dpvp.cds@emcotic.com...`);
         const { data, error } = await resend.emails.send({
-          from: 'DPvPer Diagnóstico <onboarding@resend.dev>',
+          from: 'DPvPer Diagnóstico <dpvp.cds@emcotic.com>',
           to: datosCompletos.demograficos.email,
           bcc: 'dpvp.cds@emcotic.com',
           subject: `Resultados de tu Diagnóstico DPvPer - ${datosCompletos.demograficos.nombre}`,
@@ -103,3 +103,4 @@ export default async function handler(request, response) {
         response.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
 }
+
