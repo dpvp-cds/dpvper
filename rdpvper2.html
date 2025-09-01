@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultados Preliminares DPvPer - Elige tu Camino</title>
+    <title>Resultados Preliminares DPvPer - Elige tu Siguiente Paso</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,125 +12,195 @@
     <style>
         body { font-family: 'Poppins', sans-serif; background-color: #F8F7F2; color: #6B6661; }
         h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: #070404; }
-        .btn-brand { background-color: #E8A613; color: white; padding: 12px 30px; border-radius: 9999px; font-weight: 600; transition: all 0.3s ease; text-decoration: none; display: inline-block; }
+        .btn-brand { background-color: #E8A613; color: white; padding: 12px 30px; border-radius: 9999px; font-weight: 600; transition: all 0.3s ease; display: inline-block; text-decoration: none; }
         .btn-brand:hover { background-color: #d4940f; transform: translateY(-2px); }
-        .btn-secondary { background-color: #transparent; border: 2px solid #E8A613; color: #E8A613; padding: 12px 30px; border-radius: 9999px; font-weight: 600; transition: all 0.3s ease; text-decoration: none; display: inline-block; }
+        .btn-secondary { background-color: transparent; border: 2px solid #E8A613; color: #E8A613; padding: 12px 30px; border-radius: 9999px; font-weight: 600; transition: all 0.3s ease; display: inline-block; text-decoration: none; }
         .btn-secondary:hover { background-color: #E8A613; color: white; transform: translateY(-2px); }
-        .card { background-color: white; border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05); height: 100%; display: flex; flex-direction: column; }
-        .card-content { flex-grow: 1; }
+        .card { background-color: white; border-radius: 16px; padding: 2rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .choice-card { height: 100%; display: flex; flex-direction: column; text-align: center; }
+        .choice-card .content { flex-grow: 1; }
+        .blurry-card { position: relative; overflow: hidden; border: 2px dashed #d1d5db; }
+        .blurry-card .content { filter: blur(8px); opacity: 0.5; user-select: none; }
+        .blurry-card .overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: flex; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.6); backdrop-filter: blur(2px); }
     </style>
 </head>
-<body class="antialiased">
+<body class="leading-relaxed">
 
     <header class="bg-white py-4 shadow-sm">
         <div class="container mx-auto px-6 flex justify-between items-center">
-            <a href="/" class="flex items-center space-x-3">
-                <img src="logoprincipal.jpg" alt="Logo Caminos del Ser" class="h-12 w-auto">
-                <h1 class="text-xl font-bold tracking-tight">Caminos del Ser</h1>
+            <a href="index.html">
+                <img src="logoprincipal.png" alt="Logo DPvPer" class="h-12">
             </a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="https://caminosdelser.co" class="text-gray-600 hover:text-[#E8A613]">Inicio</a>
+                <a href="BaseTeorica_PI.pdf" target="_blank" class="text-gray-600 hover:text-[#E8A613]">Base Teórica</a>
+                <a href="https://wa.me/573233796547" target="_blank" class="text-gray-600 hover:text-[#E8A613]">Contacto</a>
+            </div>
         </div>
     </header>
-    
-    <main class="container mx-auto px-6 py-12 md:py-16">
-        <div class="max-w-4xl mx-auto">
 
-            <div id="resultados-preliminares" class="text-center">
-                <h1 class="text-4xl md:text-5xl font-bold mb-4">Un Vistazo a Tu Esencia</h1>
-                <p class="text-lg md:text-xl text-gray-600 mb-2">Hola <span id="nombre-usuario" class="font-bold text-[#070404]"></span>, gracias por completar el diagnóstico.</p>
-                <p class="text-lg md:text-xl text-gray-600 mb-10">Este gráfico representa una instantánea de la alineación actual con tu propósito de vida a través de las 6 dimensiones del Método HALCÓN.</p>
+    <main id="main-content" class="container mx-auto px-6 py-12">
+        <div id="vistaPublica">
+            <div class="text-center py-20">
+                <h1 class="text-3xl">Cargando tus resultados...</h1>
             </div>
-            
-            <div class="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-16">
-                <div class="h-80 sm:h-96 md:h-[500px]">
-                    <canvas id="radarChart"></canvas>
-                </div>
-            </div>
-
-            <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold">Elige Tu Siguiente Paso</h2>
-                <p class="text-lg text-gray-600 mt-2">Ahora tienes el poder de decidir cómo continuar este viaje de autodescubrimiento.</p>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                
-                <div class="card text-center">
-                    <div class="card-content">
-                        <svg class="w-16 h-16 mx-auto mb-4 text-[#E8A613]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m-7.5-2.922A4.5 4.5 0 0 1 7.5 12.25a4.5 4.5 0 0 1-2.25-1.002M7.5 21a9 9 0 0 0 6.23-2.024M15.75 14.25A4.5 4.5 0 0 1 11.25 18.75a4.5 4.5 0 0 1-2.25-1.002m4.5 2.25a9 9 0 0 1-6.23 2.024M3.75 14.25a4.5 4.5 0 0 1 3.526-1.672M3.75 14.25L3.75 14.25z" /></svg>
-                        <h3 class="text-2xl font-bold mb-3">Opción 1: Sesión de Profundización</h3>
-                        <p class="mb-6 text-gray-600">Ideal si buscas una interpretación guiada. En una sesión personalizada, analizaremos a fondo tus resultados, resolveremos tus dudas y crearemos un plan de acción inicial para alinear tus proyectos con tu propósito.</p>
-                    </div>
-                    <a href="mailto:jorge.arango@caminosdelser.com?subject=Solicitud de Cita para Análisis DPvPer" class="btn-secondary mt-auto">Agendar Cita</a>
-                </div>
-
-                <div class="card text-center border-2 border-[#E8A613]">
-                     <div class="card-content">
-                        <svg class="w-16 h-16 mx-auto mb-4 text-[#E8A613]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m.75 12 3 3m0 0 3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z" /></svg>
-                        <h3 class="text-2xl font-bold mb-3">Opción 2: Informe Completo Inmediato</h3>
-                        <p class="mb-6 text-gray-600">Perfecto si prefieres un recurso detallado para autogestión. Descarga un informe completo en PDF con el análisis de cada dimensión, sugerencias prácticas y ejercicios de PNL para potenciar tus fortalezas.</p>
-                    </div>
-                    <div id="payment-gateway-placeholder" class="mt-auto">
-                        <button class="btn-brand w-full">Pagar $10 USD y Descargar</button>
-                    </div>
-                </div>
-
-            </div>
-
         </div>
     </main>
 
-    <footer class="bg-[#070404] text-white py-12 mt-16">
-        <div class="container mx-auto text-center">
-            <p class="text-gray-400">&copy; 2025 Jorge Arango Castaño - Caminos del Ser. Todos los derechos reservados.</p>
+    <footer class="bg-[#070404] text-white py-12">
+        <div class="container mx-auto text-center px-6">
+            <p class="text-gray-400">&copy; 2025 Jorge Arango Castaño - DPvPer.</p>
+            <a href="terapeuta-login.html" class="text-sm text-gray-400 hover:text-white transition-colors mt-2 inline-block">Acceso Terapeutas</a>
         </div>
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', () => {
             const sessionData = sessionStorage.getItem('dpvperResultados');
+            const mainContent = document.getElementById('main-content');
+
             if (!sessionData) {
-                document.querySelector('main').innerHTML = '<h1 class="text-center text-3xl">No se encontraron resultados. Por favor, completa primero el cuestionario.</h1>';
+                mainContent.innerHTML = '<div class="text-center py-20"><h1 class="text-3xl text-red-600">No se encontraron resultados.</h1><p class="mt-4">Por favor, completa primero el cuestionario.</p><a href="index.html" class="btn-brand mt-6 inline-block">Ir al Cuestionario</a></div>';
                 return;
             }
 
-            const datosCompletos = JSON.parse(sessionData);
-            const { demograficos, respuestas } = datosCompletos;
-            
-            document.getElementById('nombre-usuario').textContent = demograficos.nombre.split(' ')[0];
-
-            const scores = {
-                'H': 0, 'A': 0, 'L': 0, 'C': 0, 'O': 0, 'N': 0
-            };
-            
-            for(let i = 1; i <= 24; i++) {
-                const value = parseInt(respuestas[`q${i}`]);
-                if (i >= 1 && i <= 4) scores['H'] += value;
-                else if (i >= 5 && i <= 8) scores['A'] += value;
-                else if (i >= 9 && i <= 12) scores['L'] += value;
-                else if (i >= 13 && i <= 16) scores['C'] += value;
-                else if (i >= 17 && i <= 20) scores['O'] += value;
-                else if (i >= 21 && i <= 24) scores['N'] += value;
+            try {
+                const datosCompletos = JSON.parse(sessionData);
+                procesarResultados(datosCompletos);
+            } catch (e) {
+                console.error("Error al procesar los datos:", e);
+                mainContent.innerHTML = '<h1 class="text-3xl text-center text-red-600">Hubo un error al procesar tus resultados.</h1>';
             }
-
-            renderizarGrafico(scores);
         });
 
-        function renderizarGrafico(scores) {
-            const ctx = document.getElementById('radarChart').getContext('2d');
-            const chartLabels = [
-                'Habilidades y Esencia', 'Aspiración y Visión', 'Lógica y Coherencia',
-                'Construcción', 'Orientación y Adaptación', 'Nutrición y Trascendencia'
-            ];
-            
-            const backgroundColors = 'rgba(232, 166, 19, 0.2)';
-            const pointColors = 'rgba(232, 166, 19, 1)';
+        function procesarResultados(datosCompletos) {
+            const respuestas = datosCompletos.respuestas;
+            const demograficos = datosCompletos.demograficos;
 
+            const arquetiposInfo = {
+                a: { nombre: 'Analista / Sabio', descripcion: 'Tu motor es el conocimiento, la lógica y la búsqueda de la verdad. Encuentras sentido al entender el mundo, organizar sistemas y resolver problemas complejos.' },
+                b: { nombre: 'Creador / Innovador', descripcion: 'Tu energía proviene de la imaginación, la originalidad y la necesidad de dar forma a lo nuevo. Te sientes más vivo/a cuando creas, inventas o expresas una visión única.' },
+                c: { nombre: 'Conector / Humanista', descripcion: 'Encuentras tu propósito en la red de relaciones humanas. Tu fuerza radica en la empatía, en construir puentes entre personas y en fomentar la comunidad.' },
+                d: { nombre: 'Explorador', descripcion: 'Te impulsa un profundo anhelo de libertad, autonomía y nuevas experiencias. Tu propósito no es un destino, sino el viaje mismo: aprender y descubrir.' },
+                e: { nombre: 'Constructor / Contribuidor', descripcion: 'Tu motivación es el impacto tangible y el servicio a una causa más grande que tú. Eres una persona de acción que encuentra sentido al edificar y aportar de forma práctica.' },
+                f: { nombre: 'Sanador / Espiritual', descripcion: 'Tu energía se dirige hacia el mundo interior. Buscas la armonía, el equilibrio y la paz, tanto para ti como para los demás. Tu propósito se manifiesta al guiar a otros al bienestar.' }
+            };
+
+            const scores = { a: 0, b: 0, c: 0, d: 0, e: 0, f: 0 };
+            for (const pregunta in respuestas) {
+                const arquetipoVotado = respuestas[pregunta];
+                if (arquetipoVotado !== 'na') {
+                    scores[arquetipoVotado]++;
+                }
+            }
+
+            const sortedScores = Object.entries(scores).sort(([,a],[,b]) => b-a);
+            
+            const arquetipoPrimario = sortedScores[0];
+            const arquetipoSecundario = sortedScores[1];
+            const arquetipoTerciario = sortedScores[2];
+
+            mostrarVistaPublica(demograficos, scores, arquetipoPrimario, arquetipoSecundario, arquetipoTerciario, arquetiposInfo);
+        }
+
+        function mostrarVistaPublica(demograficos, scores, primario, secundario, terciario, info) {
+            const vistaPublicaDiv = document.getElementById('vistaPublica');
+            
+            const nombreSecundario = info[secundario[0]].nombre;
+            const descSecundario = info[secundario[0]].descripcion;
+
+            let html = `
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-5xl">Hola, ${demograficos.nombre.split(' ')[0]}</h1>
+                    <p class="text-lg mt-2">Este es un avance de tu Diagnóstico DPvPer.</p>
+                </div>
+
+                <div class="card mt-10">
+                    <h2 class="text-3xl text-center mb-8">Un Vistazo a tu Mundo Interior</h2>
+                    <p class="text-center max-w-3xl mx-auto mb-10">Tus respuestas revelan un perfil único de motivaciones. Hemos identificado tus tres arquetipos principales. Como avance, te revelamos tu <strong>arquetipo secundario</strong>, la energía que colorea y da contexto a tu fuerza principal.</p>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+                        <div class="blurry-card text-center p-6 h-full">
+                            <div class="content">
+                                <h3 class="text-xl font-bold">Tu Arquetipo Primario</h3>
+                                <p class="text-4xl my-4">❓</p>
+                                <p>Esta es tu fuerza dominante, el motor principal de tu ser. Define tu "qué" más fundamental en la vida.</p>
+                            </div>
+                            <div class="overlay">
+                               <span class="text-center font-bold text-lg bg-gray-200 px-4 py-2 rounded-full shadow">🔒 Arquetipo Bloqueado</span>
+                            </div>
+                        </div>
+
+                        <div class="text-center p-6 border-4 border-[#E8A613] rounded-lg transform lg:scale-110 shadow-2xl z-10 bg-white h-full flex flex-col justify-center">
+                               <h3 class="text-xl font-bold text-gray-500">Tu Arquetipo Secundario</h3>
+                               <h4 class="text-3xl text-[#070404] mt-2">${nombreSecundario}</h4>
+                               <p class="mt-4">${descSecundario}</p>
+                        </div>
+
+                        <div class="blurry-card text-center p-6 h-full">
+                            <div class="content">
+                                <h3 class="text-xl font-bold">Tu Arquetipo Terciario</h3>
+                                <p class="text-4xl my-4">❓</p>
+                                <p>Esta es tu energía de apoyo. Representa el "para qué" de tus acciones y nutre a tus otras dos fuerzas.</p>
+                            </div>
+                             <div class="overlay">
+                               <span class="text-center font-bold text-lg bg-gray-200 px-4 py-2 rounded-full shadow">🔒 Arquetipo Bloqueado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-10">
+                     <h2 class="text-3xl text-center mb-2">Tu Perfil de Motivaciones</h2>
+                     <p class="text-center max-w-3xl mx-auto mb-8">La gráfica muestra la intensidad de todas tus energías arquetípicas. Hemos resaltado tu arquetipo secundario para que veas su relación con las demás fuerzas que te definen.</p>
+                     <div class="chart-container" style="height: 350px; max-height: 400px;">
+                         <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="mt-16 text-center">
+                    <h2 class="text-4xl font-bold">Elige Tu Siguiente Paso</h2>
+                    <p class="text-lg text-gray-600 mt-2 max-w-3xl mx-auto">Este avance es solo la punta del iceberg. Ahora tienes el poder de decidir cómo profundizar en este viaje de autodescubrimiento.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
+                    <div class="card choice-card">
+                        <div class="content">
+                            <h3 class="text-2xl font-bold mb-3">Opción 1: Sesión de Profundización</h3>
+                            <p class="mb-6 text-gray-600">Ideal si buscas una interpretación guiada. En una sesión personalizada, analizaremos a fondo tu reporte completo (incluyendo tus arquetipos primario y terciario), resolveremos tus dudas y crearemos un plan de acción para alinear tus proyectos con tu propósito.</p>
+                        </div>
+                        <a href="https://wa.me/573233796547?text=Hola%20Jorge,%20acabo%20de%20realizar%20el%20DPvPer%20y%20estoy%20interesado/a%20en%20agendar%20una%20sesión%20para%20analizar%20mis%20resultados%20completos." target="_blank" class="btn-secondary mt-auto">Agendar una Cita</a>
+                    </div>
+
+                    <div class="card choice-card border-2 border-[#E8A613]">
+                        <div class="content">
+                            <h3 class="text-2xl font-bold mb-3">Opción 2: Informe Completo Inmediato</h3>
+                            <p class="mb-6 text-gray-600">Perfecto si prefieres un recurso detallado para autogestión. Obtén acceso inmediato a tu reporte completo en PDF con el análisis de tus tres arquetipos, la interacción entre ellos y tu **"Fórmula de Propósito"** personalizada.</p>
+                        </div>
+                        <div id="payment-gateway-placeholder" class="mt-auto">
+                            <button class="btn-brand w-full">Pagar $10 USD y Descargar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            vistaPublicaDiv.innerHTML = html;
+
+            const archetypeOrder = ['a', 'b', 'c', 'd', 'e', 'f'];
+            const secondaryIndex = archetypeOrder.indexOf(secundario[0]);
+            
+            const pointColors = archetypeOrder.map((_, index) => index === secondaryIndex ? '#E8A613' : 'rgba(107, 114, 128, 0.4)');
+            const backgroundColors = archetypeOrder.map((_, index) => index === secondaryIndex ? 'rgba(232, 166, 19, 0.4)' : 'rgba(107, 114, 128, 0.1)');
+            const chartLabels = Object.values(info).map((a, index) => info[archetypeOrder[index]].nombre.split(' / ')[0]);
+
+            const ctx = document.getElementById('radarChart').getContext('2d');
             new Chart(ctx, {
                 type: 'radar',
                 data: {
                     labels: chartLabels,
                     datasets: [{
                         label: 'Tu Puntuación',
-                        data: Object.values(scores),
+                        data: archetypeOrder.map(key => scores[key]),
                         backgroundColor: backgroundColors,
                         borderColor: pointColors,
                         pointBackgroundColor: pointColors,
@@ -152,9 +222,9 @@
                                 font: { size: 14, weight: 'bold' }, 
                                 color: '#070404'
                             },
-                            ticks: { display: false, stepSize: 5 }, // Max score is 4*5=20
+                            ticks: { display: false, stepSize: 2 },
                             suggestedMin: 0,
-                            suggestedMax: 20
+                            suggestedMax: Math.max(...Object.values(scores)) + 1
                         }
                     },
                     plugins: { legend: { display: false } }
