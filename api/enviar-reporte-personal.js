@@ -2,7 +2,7 @@ import { db } from './lib/firebaseAdmin.js';
 import { Resend } from 'resend';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
-// Función para crear un PDF simple con los resultados
+// Función para crear un PDF simple (sin cambios)
 async function crearPDF(datos) {
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage();
@@ -38,7 +38,7 @@ async function crearPDF(datos) {
     }
 
     y -= 20;
-    page.drawText('Para un análisis completo y descubrir tu fórmula de propósito, agenda una cita.', { x: 50, y, font, size: 14, color: rgb(0.1, 0.1, 0.1) });
+    page.drawText('Para un análisis completo, agenda una cita.', { x: 50, y, font, size: 14, color: rgb(0.1, 0.1, 0.1) });
 
     const pdfBytes = await pdfDoc.save();
     return Buffer.from(pdfBytes);
@@ -46,6 +46,7 @@ async function crearPDF(datos) {
 
 
 export default async function handler(req, res) {
+    console.log("Iniciando función enviar-reporte-personal...");
     if (req.method !== 'POST') {
         return res.status(405).json({ message: 'Método no permitido' });
     }
@@ -53,18 +54,26 @@ export default async function handler(req, res) {
     try {
         const datosCompletos = req.body;
         datosCompletos.fecha = new Date();
-
+        
+        console.log("Datos recibidos, guardando en Firebase...");
         const docRef = await db.collection('reportes_dpvper').add(datosCompletos);
+        console.log(`Datos guardados en Firestore con ID: ${docRef.id}`);
 
-        const resend = new Resend(process.env.RESEND2_API_KEY);
+        // --- SECCIÓN DE CORREO (Punto de Foco) ---
+        console.log("Preparando para enviar correo con Resend...");
+        const resend = new Resend(process.env.RESEND2_API_KEY); 
+        
+        console.log("Creando PDF...");
         const pdfBuffer = await crearPDF(datosCompletos);
+        console.log("PDF creado exitosamente.");
 
-        await resend.emails.send({
-          from: 'DPvPer Diagnóstico <onboarding@resend.dev>', // CORREO CORREGIDO
+        console.log(`Enviando correo a ${datosCompletos.demograficos.email} y copia a dpvp.cds@emcotic.com...`);
+        const { data, error } = await resend.emails.send({
+          from: 'DPvPer Diagnóstico <onboarding@resend.dev>',
           to: datosCompletos.demograficos.email,
-          bcc: 'dpvp.cds@emcotic.com', // TU CORREO PARA RECIBIR COPIA
+          bcc: 'dpvp.cds@emcotic.com',
           subject: `Resultados de tu Diagnóstico DPvPer - ${datosCompletos.demograficos.nombre}`,
-          html: `<h1>Hola ${datosCompletos.demograficos.nombre.split(' ')[0]},</h1><p>Gracias por completar la Escala DPvPer.</p><p>Adjunto encontrarás un resumen en PDF con tus puntuaciones de arquetipos. Para un análisis completo y descubrir tu fórmula de propósito, te invito a agendar una cita.</p><p>Un saludo,<br>Jorge Arango Castaño</p>`,
+          html: `<h1>Hola ${datosCompletos.demograficos.nombre.split(' ')[0]},</h1><p>Gracias por completar la Escala DPvPer. Adjunto encontrarás un resumen en PDF con tus puntuaciones.</p><p>Un saludo,<br>Jorge Arango Castaño</p>`,
           attachments: [
             {
               filename: `Reporte-DPvPer-${docRef.id}.pdf`,
@@ -73,12 +82,17 @@ export default async function handler(req, res) {
           ],
         });
 
+        if (error) {
+            console.error("Resend devolvió un error:", error);
+            throw new Error(error.message);
+        }
+
+        console.log("Correo enviado exitosamente. ID de envío:", data.id);
         res.status(200).json({ message: 'Reporte guardado y correo enviado con éxito', id: docRef.id });
 
     } catch (error) {
-        console.error('Error al procesar el reporte y enviar correo:', error);
-        res.status(500).json({ message: 'Error interno del servidor.' });
+        console.error('ERROR DETALLADO EN EL BLOQUE CATCH:', error);
+        res.status(500).json({ message: 'Error interno del servidor al enviar el correo.' });
     }
 }
-
 
