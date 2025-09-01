@@ -25,6 +25,7 @@
 </head>
 <body class="leading-relaxed">
 
+    <!-- BARRA DE NAVEGACIÓN -->
     <nav class="bg-white py-4 shadow-sm sticky top-0 z-20">
         <div class="container mx-auto px-6 flex justify-between items-center">
             <a href="index.html">
@@ -38,6 +39,7 @@
         </div>
     </nav>
 
+    <!-- SECCIÓN DE INTRODUCCIÓN (HERO) -->
     <section id="hero-section" class="text-center py-20 lg:py-32 px-6 bg-white">
         <h1 class="text-4xl md:text-6xl font-bold mb-4">Descubre tu Propósito de Vida.</h1>
         <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8">La Escala DPvPer es una herramienta de autodescubrimiento diseñada para ayudarte a identificar tus impulsores internos y encontrar tu brújula personal. Descubre qué te mueve y cómo alinear tu vida con tu verdadera esencia.</p>
@@ -45,6 +47,7 @@
 
     <main class="container mx-auto px-6 pb-12">
         <form id="dpvperForm" novalidate>
+            <!-- CONTENEDOR DE DATOS DEMOGRÁFICOS -->
             <div id="demographics-wrapper">
                 <section class="card mb-12">
                     <h2 class="text-3xl mb-6 border-b pb-4">Paso 1: Comencemos por conocerte</h2>
@@ -315,11 +318,13 @@
                 </section>
             </div>
 
+            <!-- CONTENEDOR DEL CUESTIONARIO (INICIALMENTE OCULTO) -->
             <div id="cuestionario-wrapper" class="hidden">
                 <section id="cuestionario">
                     <h2 class="text-3xl mb-2 border-b pb-4">Paso 2: Exploremos tu mundo interior</h2>
                     <p class="mt-4 mb-6 text-base">A continuación, encontrarás 12 preguntas de selección. Elige la opción que más resuene contigo de forma intuitiva, sin pensarlo demasiado. Este cuestionario no te tomará más de 5 minutos.</p>
                     
+                    <!-- PREGUNTAS 1-12 ACTUALIZADAS -->
                     <div class="card question-card">
                         <h3 class="text-xl mb-4">1. Cuando te sientes completamente absorto y lleno de energía, generalmente estás...</h3>
                         <div class="space-y-3">
@@ -464,13 +469,14 @@
                         </div>
                     </div>
 
+                    <!-- CAPTCHA Y POLÍTICAS -->
                     <div class="card mt-8">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                             <div>
                                 <label for="captcha" class="font-medium block mb-2">Prueba de seguridad</label>
                                 <div class="flex items-center space-x-4">
                                     <div id="captcha-container" class="relative w-40 h-16 bg-gray-100 rounded-md p-1 flex items-center justify-center overflow-hidden border">
-                                        <span id="captcha-question-text" class="text-2xl font-bold text-gray-800 select-none tracking-widest"></span>
+                                       <span id="captcha-question-text" class="text-2xl font-bold text-gray-800 select-none tracking-widest"></span>
                                     </div>
                                     <input type="number" id="captcha-answer" class="input-styled w-24">
                                     <button type="button" id="reload-captcha" class="text-sm text-[#E8A613] hover:underline whitespace-nowrap">Cambiar</button>
@@ -497,11 +503,13 @@
         </form>
     </main>
 
+    <!-- BANNER DE COOKIES -->
     <div id="cookie-banner" class="fixed bottom-0 left-0 right-0 bg-gray-800 text-white p-4 flex flex-col md:flex-row justify-between items-center z-30 hidden gap-4 md:gap-0">
         <p class="text-sm text-center md:text-left">Este sitio web utiliza cookies para mejorar tu experiencia. Al continuar navegando, aceptas su uso. Para más información, consulta nuestra <a href="https://caminosdelser.co/politicadatos.html" target="_blank" class="font-medium hover:underline text-gray-300">Política de Protección de Datos</a>.</p>
         <button id="accept-cookies" class="bg-gray-200 text-gray-800 font-bold py-2 px-4 rounded whitespace-nowrap">Aceptar</button>
     </div>
 
+    <!-- FOOTER -->
     <footer class="bg-[#070404] text-white py-12">
         <div class="container mx-auto text-center px-6">
             <p class="text-gray-400">&copy; 2025 Jorge Arango Castaño - DPvPer.</p>
@@ -535,7 +543,7 @@
                         allFilled = false;
                         input.classList.add('border-red-500');
                     } else {
-                        input.classList.remove('border-red-500');
+                         input.classList.remove('border-red-500');
                     }
                 });
 
@@ -594,3 +602,65 @@
                         break;
                     }
                 }
+
+                const validationMessage = document.getElementById('validation-message');
+                if (!allQuestionsAnswered) {
+                    validationMessage.classList.remove('hidden');
+                    return;
+                }
+                
+                validationMessage.classList.add('hidden');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Procesando...';
+
+                const demograficos = {
+                    nombre: document.getElementById('nombre').value,
+                    email: document.getElementById('email').value,
+                    edad: parseInt(document.getElementById('edad').value, 10),
+                    pais: document.getElementById('pais').value,
+                    nivel_educativo: document.getElementById('nivel_educativo').value,
+                    situacion_laboral: document.getElementById('situacion_laboral').value,
+                    situacion_sentimental: document.getElementById('situacion_sentimental').value,
+                    hijos: parseInt(document.getElementById('hijos').value, 10),
+                    mascotas: document.getElementById('mascotas').value,
+                };
+
+                const respuestas = {};
+                for (let i = 1; i <= 12; i++) {
+                    respuestas[`q${i}`] = form.elements[`q${i}`].value;
+                }
+
+                const datosCompletos = {
+                    demograficos,
+                    respuestas,
+                    tipo: 'DPvPer'
+                };
+                
+                sessionStorage.setItem('dpvperResultados', JSON.stringify(datosCompletos));
+
+                try {
+                    const response = await fetch('/api/enviar-reporte-personal', {
+                        method: 'POST',
+                        body: JSON.stringify(datosCompletos),
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+
+                    if (response.ok) {
+                        window.location.href = `rdpvper2.html`;
+                    } else {
+                        const errorData = await response.json();
+                        alert(`Error: ${errorData.message || 'Hubo un problema al enviar tus resultados.'}`);
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Finalizar y Ver mis Resultados';
+                    }
+                } catch (error) {
+                    alert('Hubo un error de conexión. Por favor, revisa tu conexión a internet e intenta de nuevo.');
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Finalizar y Ver mis Resultados';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
