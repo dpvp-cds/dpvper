@@ -73,7 +73,7 @@ export default async function handler(request, response) {
 
         // 3. Enviar correo con Resend
         // -----  CORRECCIÓN DE LA VARIABLE DE ENTORNO APLICADA  -----
-        const resend = new Resend(process.env.RESEND2_API_KEY);
+        const resend = new Resend(process.env.RESEND_API_KEY);
         
         console.log(`Enviando correo a ${datosCompletos.demograficos.email} y copia a dpvp.cds@emcotic.com...`);
         const { data, error } = await resend.emails.send({
@@ -103,3 +103,4 @@ export default async function handler(request, response) {
         response.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
 }
+
