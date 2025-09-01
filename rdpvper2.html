@@ -175,7 +175,7 @@
                     <div class="card choice-card border-2 border-[#E8A613]">
                         <div class="content">
                             <h3 class="text-2xl font-bold mb-3">Opción 2: Informe Completo Inmediato</h3>
-                            <p class="mb-6 text-gray-600">Perfecto si prefieres un recurso detallado para autogestión. Obtén acceso inmediato a tu reporte completo en PDF con el análisis de tus tres arquetipos, la interacción entre ellos y tu **"Fórmula de Propósito"** personalizada.</p>
+                            <p class="mb-6 text-gray-600">Perfecto si prefieres un recurso detallado para autogestión. Obtén acceso inmediato a tu reporte completo en PDF con el análisis de tus tres arquetipos, la interacción entre ellos y tu <strong>"Fórmula de Propósito"</strong> personalizada.</p>
                         </div>
                         <div id="payment-gateway-placeholder" class="mt-auto">
                             <button class="btn-brand w-full">Pagar $10 USD y Descargar</button>
@@ -191,7 +191,9 @@
             
             const pointColors = archetypeOrder.map((_, index) => index === secondaryIndex ? '#E8A613' : 'rgba(107, 114, 128, 0.4)');
             const backgroundColors = archetypeOrder.map((_, index) => index === secondaryIndex ? 'rgba(232, 166, 19, 0.4)' : 'rgba(107, 114, 128, 0.1)');
-            const chartLabels = Object.values(info).map((a, index) => info[archetypeOrder[index]].nombre.split(' / ')[0]);
+            
+            // /// LÍNEA CORREGIDA ///
+            const chartLabels = archetypeOrder.map((key, index) => index === secondaryIndex ? info[key].nombre.split(' / ')[0] : '');
 
             const ctx = document.getElementById('radarChart').getContext('2d');
             new Chart(ctx, {
