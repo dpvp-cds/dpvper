@@ -53,8 +53,7 @@
             const reportListDiv = document.getElementById('reportList');
 
             try {
-                // **SOLUCIÓN #1: ANTI-CACHÉ**
-                // Se añade { cache: 'no-store' } para forzar la carga de datos nuevos siempre.
+                // CORRECCIÓN #1: Se fuerza a pedir datos nuevos siempre, evitando la caché.
                 const response = await fetch('/api/get-reportes', { cache: 'no-store' });
                 if (!response.ok) throw new Error('Error al obtener los reportes');
                 const reportes = await response.json();
@@ -64,35 +63,34 @@
                     return;
                 }
                 
-                // Ordenar por fecha, del más reciente al más antiguo, de forma segura
-                reportes.sort((a, b) => {
-                    const dateA = a.fecha && a.fecha._seconds ? a.fecha._seconds : 0;
-                    const dateB = b.fecha && b.fecha._seconds ? b.fecha._seconds : 0;
+                // Se ordena de forma segura
+                 reportes.sort((a, b) => {
+                    const dateA = a && a.fecha && a.fecha._seconds ? a.fecha._seconds : 0;
+                    const dateB = b && b.fecha && b.fecha._seconds ? b.fecha._seconds : 0;
                     return dateB - dateA;
                 });
 
                 let html = '<div class="divide-y divide-gray-200">';
                 reportes.forEach(reporte => {
-                    // **SOLUCIÓN #2: FECHA Y NOMBRES A PRUEBA DE ERRORES**
-                    let fechaFormateada = 'Fecha no disponible';
+                    // Si un reporte viniera dañado, se lo salta para no romper la página
+                    if (!reporte || !reporte.demograficos) return;
+
+                    // CORRECCIÓN #2: La lógica de la fecha, aplicada al código original.
+                    let fecha = 'Fecha inválida';
                     if (reporte.fecha && reporte.fecha._seconds) {
                         const fechaObj = new Date(reporte.fecha._seconds * 1000);
                         if (!isNaN(fechaObj.getTime())) {
-                            fechaFormateada = fechaObj.toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' });
+                            fecha = fechaObj.toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' });
                         }
                     }
 
-                    let nombresMostrados = 'Nombres no disponibles';
-                    if (reporte.demograficos && reporte.demograficos.m1_nombre && reporte.demograficos.m2_nombre) {
-                        nombresMostrados = `${reporte.demograficos.m1_nombre} y ${reporte.demograficos.m2_nombre}`;
-                    }
-
+                    // Se mantiene la estructura ORIGINAL que sí te funcionaba para los nombres.
                     html += `
                         <a href="./reporte.html?id=${reporte.id}" class="report-item block p-4">
                             <div class="flex justify-between items-center">
                                 <div>
-                                    <p class="font-bold text-lg text-[#070404]">${nombresMostrados}</p>
-                                    <p class="text-sm text-gray-500">Fecha: ${fechaFormateada}</p>
+                                    <p class="font-bold text-lg text-[#070404]">${reporte.demograficos.m1_nombre} y ${reporte.demograficos.m2_nombre}</p>
+                                    <p class="text-sm text-gray-500">Fecha: ${fecha}</p>
                                 </div>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                             </div>
@@ -106,7 +104,7 @@
                 reportListDiv.classList.remove('hidden');
 
             } catch (error) {
-                console.error("Error durante la carga de reportes:", error);
+                console.error("Error fatal durante la carga de reportes:", error);
                 loadingDiv.textContent = 'Error crítico al cargar los reportes.';
             }
         }
