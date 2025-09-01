@@ -66,7 +66,6 @@
                     return;
                 }
                 
-                // Ordenar reportes por fecha, del más reciente al más antiguo
                 reportes.sort((a, b) => {
                     const dateA = a.fecha._seconds ? new Date(a.fecha._seconds * 1000) : new Date(a.fecha);
                     const dateB = b.fecha._seconds ? new Date(b.fecha._seconds * 1000) : new Date(b.fecha);
@@ -75,8 +74,7 @@
 
                 let html = '<div class="divide-y divide-gray-200">';
                 reportes.forEach(reporte => {
-                    // **AQUÍ ESTÁ LA CORRECCIÓN**
-                    // Verificamos si la fecha viene en el formato de Firestore (_seconds) o como un string ISO
+                    // **CORRECCIÓN #1: FECHA**
                     const fechaObj = reporte.fecha && reporte.fecha._seconds 
                         ? new Date(reporte.fecha._seconds * 1000 + (reporte.fecha._nanoseconds || 0) / 1000000)
                         : new Date(reporte.fecha);
@@ -84,11 +82,17 @@
                     const fechaFormateada = !isNaN(fechaObj) 
                         ? fechaObj.toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' })
                         : 'Fecha inválida';
+                    
+                    // **CORRECCIÓN #2: NOMBRES**
+                    // Se añade una verificación para manejar datos incompletos.
+                    const nombrePareja = (reporte.demograficos && reporte.demograficos.m1_nombre && reporte.demograficos.m2_nombre)
+                        ? `${reporte.demograficos.m1_nombre} y ${reporte.demograficos.m2_nombre}`
+                        : 'Nombres no disponibles';
 
                     html += `
                         <div class="report-item p-4 flex justify-between items-center">
                             <a href="./reporte.html?id=${reporte.id}" class="flex-grow">
-                                <p class="font-bold text-lg text-[#070404]">${reporte.demograficos.m1_nombre} y ${reporte.demograficos.m2_nombre}</p>
+                                <p class="font-bold text-lg text-[#070404]">${nombrePareja}</p>
                                 <p class="text-sm text-gray-500">Fecha: ${fechaFormateada}</p>
                             </a>
                             <button onclick="deleteReport('${reporte.id}', this)" class="ml-4 text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-100 transition-colors">
