@@ -1,8 +1,9 @@
 import { db } from './lib/firebaseAdmin.js';
 import { Resend } from 'resend';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import { Buffer } from 'buffer';
 
-// Función para crear un PDF simple (sin cambios)
+// Función para crear el PDF del reporte personal
 async function crearPDF(datos) {
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage();
@@ -12,61 +13,68 @@ async function crearPDF(datos) {
     
     let y = height - 50;
     
+    // Título
     page.drawText('Reporte Preliminar - Escala DPvPer', { x: 50, y, font: boldFont, size: 24, color: rgb(0, 0, 0) });
     y -= 40;
 
+    // Datos demográficos
     page.drawText(`Nombre: ${datos.demograficos.nombre}`, { x: 50, y, font, size: 12 });
     y -= 20;
     page.drawText(`Email: ${datos.demograficos.email}`, { x: 50, y, font, size: 12 });
     y -= 30;
 
+    // Resultados de Arquetipos
     page.drawText('Resultados de Arquetipos:', { x: 50, y, font: boldFont, size: 16 });
     y -= 25;
 
-    const scores = { a: 0, b: 0, c: 0, d: 0, e: 0, f: 0 };
-    for (const pregunta in datos.respuestas) {
-        const arquetipoVotado = datos.respuestas[pregunta];
-        if (arquetipoVotado !== 'na') {
-            scores[arquetipoVotado]++;
+    // Procesar y mostrar los puntajes
+    const arquetipos = {
+        a: "El Guerrero", b: "El Creador", c: "El Amante", d: "El Sabio",
+        e: "El Explorador", f: "El Inocente", g: "El Gobernante", h: "El Mago"
+    };
+
+    const scores = datos.resultados;
+    for (const arquetipo in scores) {
+        if (arquetipos[arquetipo]) {
+             page.drawText(`${arquetipos[arquetipo]}: ${scores[arquetipo]} / 10`, { x: 70, y, font, size: 12 });
+             y -= 20;
         }
     }
-    const arquetiposNombres = { a: 'Analista/Sabio', b: 'Creador', c: 'Conector', d: 'Explorador', e: 'Constructor', f: 'Sanador' };
-    
-    for(const [key, value] of Object.entries(scores)) {
-        page.drawText(`${arquetiposNombres[key]}: ${value} puntos`, { x: 70, y, font, size: 12 });
-        y -= 20;
-    }
-
-    y -= 20;
-    page.drawText('Para un análisis completo, agenda una cita.', { x: 50, y, font, size: 14, color: rgb(0.1, 0.1, 0.1) });
 
     const pdfBytes = await pdfDoc.save();
-    return Buffer.from(pdfBytes);
+    return pdfBytes;
 }
 
 
-export default async function handler(req, res) {
-    console.log("Iniciando función enviar-reporte-personal...");
-    if (req.method !== 'POST') {
-        return res.status(405).json({ message: 'Método no permitido' });
+// Handler principal de la API
+export default async function handler(request, response) {
+    if (request.method !== 'POST') {
+        return response.status(405).json({ message: 'Método no permitido' });
     }
 
     try {
-        const datosCompletos = req.body;
-        datosCompletos.fecha = new Date();
-        
-        console.log("Datos recibidos, guardando en Firebase...");
-        const docRef = await db.collection('reportes_dpvper').add(datosCompletos);
-        console.log(`Datos guardados en Firestore con ID: ${docRef.id}`);
+        const datosCompletos = request.body;
+        console.log("Recibiendo datos para guardar y enviar...");
 
-        // --- SECCIÓN DE CORREO (Punto de Foco) ---
-        console.log("Preparando para enviar correo con Resend...");
-        const resend = new Resend(process.env.RESEND2_API_KEY); 
-        
+        // 1. Guardar en Firestore
+        console.log("Guardando en la colección 'reportes-personales'...");
+        const docRef = await db.collection('reportes-personales').add({
+            ...datosCompletos,
+            fecha: new Date().toISOString()
+        });
+        console.log("Datos guardados con éxito. ID del documento:", docRef.id);
+
+
+        // 2. Crear el PDF
         console.log("Creando PDF...");
         const pdfBuffer = await crearPDF(datosCompletos);
         console.log("PDF creado exitosamente.");
 
+
+        // 3. Enviar correo con Resend
+        // -----  CORRECCIÓN DE LA VARIABLE DE ENTORNO APLICADA  -----
+        const resend = new Resend(process.env.RESEND2_API_KEY);
+        
         console.log(`Enviando correo a ${datosCompletos.demograficos.email} y copia a dpvp.cds@emcotic.com...`);
         const { data, error } = await resend.emails.send({
           from: 'DPvPer Diagnóstico <onboarding@resend.dev>',
@@ -77,7 +85,7 @@ export default async function handler(req, res) {
           attachments: [
             {
               filename: `Reporte-DPvPer-${docRef.id}.pdf`,
-              content: pdfBuffer,
+              content: Buffer.from(pdfBuffer),
             },
           ],
         });
@@ -88,11 +96,10 @@ export default async function handler(req, res) {
         }
 
         console.log("Correo enviado exitosamente. ID de envío:", data.id);
-        res.status(200).json({ message: 'Reporte guardado y correo enviado con éxito', id: docRef.id });
+        response.status(200).json({ message: 'Reporte guardado y correo enviado con éxito', id: docRef.id });
 
     } catch (error) {
-        console.error('ERROR DETALLADO EN EL BLOQUE CATCH:', error);
-        res.status(500).json({ message: 'Error interno del servidor al enviar el correo.' });
+        console.error("Error en el proceso:", error);
+        response.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
 }
-
