@@ -40,19 +40,19 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label for="nombre" class="block mb-2 font-medium">Nombre Completo</label>
-                        <input type="text" id="nombre" class="input-styled" required>
+                        <input type="text" id="nombre" name="nombre" class="input-styled" required>
                     </div>
                     <div>
                         <label for="email" class="block mb-2 font-medium">Correo Electrónico</label>
-                        <input type="email" id="email" class="input-styled" required>
+                        <input type="email" id="email" name="email" class="input-styled" required>
                     </div>
                     <div>
                         <label for="edad" class="block mb-2 font-medium">Edad</label>
-                        <input type="number" id="edad" class="input-styled" required>
+                        <input type="number" id="edad" name="edad" class="input-styled" required>
                     </div>
                     <div>
                         <label for="ciudad" class="block mb-2 font-medium">Ciudad y País de Residencia</label>
-                        <input type="text" id="ciudad" class="input-styled" required>
+                        <input type="text" id="ciudad" name="ciudad" class="input-styled" required>
                     </div>
                 </div>
             </div>
@@ -79,46 +79,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const preguntas = [
-                { id: 'P1', texto: '¿Sientes que tienes un propósito claro en la vida?', arquetipo: 'd' },
-                { id: 'P2', texto: '¿Te consideras una persona creativa y original?', arquetipo: 'b' },
-                { id: 'P3', texto: '¿Disfrutas de la aventura y de explorar nuevos lugares o ideas?', arquetipo: 'e' },
-                { id: 'P4', texto: '¿Valoras la seguridad y la estabilidad por encima de todo?', arquetipo: 'f' },
-                { id: 'P5', texto: '¿Te sientes cómodo liderando a otros y tomando decisiones importantes?', arquetipo: 'g' },
-                { id: 'P6', texto: '¿La gente te busca por tu sabiduría y tus consejos?', arquetipo: 'd' },
-                { id: 'P7', texto: '¿Te esfuerzas por superar los obstáculos con valentía y determinación?', arquetipo: 'a' },
-                { id: 'P8', texto: '¿Buscas constantemente transformar las situaciones para mejorarlas?', arquetipo: 'h' },
-                { id: 'P9', texto: '¿Para ti es fundamental conectar emocionalmente con las personas?', arquetipo: 'c' },
-                { id: 'P10', texto: '¿Crees que la vida es un viaje lleno de maravillas por descubrir?', arquetipo: 'e' },
-                { id: 'P11', texto: '¿Prefieres construir algo nuevo y duradero a seguir lo ya establecido?', arquetipo: 'b' },
-                { id: 'P12', texto: '¿Te sientes responsable del bienestar de tu comunidad o grupo?', arquetipo: 'g' },
-                { id: 'P13', texto: '¿Crees en el poder del amor y la pasión para guiar tus acciones?', arquetipo: 'c' },
-                { id: 'P14', texto: '¿Confías en tu intuición y en tu capacidad para que las cosas sucedan?', arquetipo: 'h' },
-                { id: 'P15', texto: '¿Te identificas con la lucha por la justicia y la defensa de los débiles?', arquetipo: 'a' },
-                { id: 'P16', texto: '¿Mantienes una actitud optimista y confías en la bondad de los demás?', arquetipo: 'f' },
-                { id: 'P17', texto: '¿El análisis y la reflexión son cruciales antes de tomar una decisión?', arquetipo: 'd' },
-                { id: 'P18', texto: '¿Te sientes lleno de energía cuando enfrentas un desafío competitivo?', arquetipo: 'a' },
-                { id: 'P19', texto: '¿Sientes una profunda curiosidad por entender cómo funciona el mundo?', arquetipo: 'h' },
-                { id: 'P20', texto: '¿La belleza, la estética y la sensualidad son importantes en tu vida?', arquetipo: 'c' },
-                { id: 'P21', texto: '¿Sueñas con crear una obra (artística, empresarial, etc.) que deje un legado?', arquetipo: 'b' },
-                { id: 'P22', texto: '¿Buscas la libertad y la independencia en todos los aspectos de tu vida?', arquetipo: 'e' },
-                { id: 'P23', texto: '¿Crees que las reglas y el orden son esenciales para una sociedad funcional?', arquetipo: 'g' },
-                { id: 'P24', texto: '¿Tiendes a ver el lado bueno de las cosas y a esperar un final feliz?', arquetipo: 'f' },
-                { id: 'P25', texto: '¿Te consideras un maestro o mentor para otras personas?', arquetipo: 'd' },
-                { id: 'P26', texto: '¿Estás dispuesto a sacrificarte para proteger a quienes amas?', arquetipo: 'a' },
-                { id: 'P27', texto: '¿Te atrae el misterio y lo que no se ve a simple vista?', arquetipo: 'h' },
-                { id: 'P28', texto: '¿Valoras las relaciones íntimas y cercanas por encima de los logros materiales?', arquetipo: 'c' },
-                { id: 'P29', texto: '¿La autoexpresión a través de alguna forma de arte o creación es vital para ti?', arquetipo: 'b' },
-                { id: 'P30', texto: '¿Sientes un llamado a viajar y experimentar diferentes culturas?', arquetipo: 'e' },
-                { id: 'P31', texto: '¿Asumes el control de las situaciones para garantizar el éxito?', arquetipo: 'g' },
-                { id: 'P32', texto: '¿Crees en la simplicidad y en encontrar la felicidad en las pequeñas cosas?', arquetipo: 'f' },
-                { id: 'P33', texto: '¿La búsqueda de la verdad y el conocimiento es una de tus mayores motivaciones?', arquetipo: 'd' },
-                { id: 'P34', texto: '¿Te ves a ti mismo como un pionero que abre nuevos caminos?', arquetipo: 'e' },
-                { id: 'P35', texto: '¿Tienes la habilidad de inspirar cambios profundos en los demás?', arquetipo: 'h' },
-                { id: 'P36', texto: '¿La lealtad y el compromiso son valores centrales en tus relaciones?', arquetipo: 'c' },
-                { id: 'P37', texto: '¿Tienes una visión clara de lo que quieres construir en tu futuro?', arquetipo: 'b' },
-                { id: 'P38', texto: '¿Te consideras una persona disciplinada y con autocontrol?', arquetipo: 'a' },
-                { id: 'P39', texto: '¿Te sientes más realizado cuando ejerces una posición de influencia y autoridad?', arquetipo: 'g' },
-                { id: 'P40', texto: '¿Crees que la fe y la esperanza pueden superar cualquier adversidad?', arquetipo: 'f' }
+                { id: 'P1', texto: '¿Sientes que tienes un propósito claro en la vida?', arquetipo: 'd' }, { id: 'P2', texto: '¿Te consideras una persona creativa y original?', arquetipo: 'b' }, { id: 'P3', texto: '¿Disfrutas de la aventura y de explorar nuevos lugares o ideas?', arquetipo: 'e' }, { id: 'P4', texto: '¿Valoras la seguridad y la estabilidad por encima de todo?', arquetipo: 'f' }, { id: 'P5', texto: '¿Te sientes cómodo liderando a otros y tomando decisiones importantes?', arquetipo: 'g' }, { id: 'P6', texto: '¿La gente te busca por tu sabiduría y tus consejos?', arquetipo: 'd' }, { id: 'P7', texto: '¿Te esfuerzas por superar los obstáculos con valentía y determinación?', arquetipo: 'a' }, { id: 'P8', texto: '¿Buscas constantemente transformar las situaciones para mejorarlas?', arquetipo: 'h' }, { id: 'P9', texto: '¿Para ti es fundamental conectar emocionalmente con las personas?', arquetipo: 'c' }, { id: 'P10', texto: '¿Crees que la vida es un viaje lleno de maravillas por descubrir?', arquetipo: 'e' }, { id: 'P11', texto: '¿Prefieres construir algo nuevo y duradero a seguir lo ya establecido?', arquetipo: 'b' }, { id: 'P12', texto: '¿Te sientes responsable del bienestar de tu comunidad o grupo?', arquetipo: 'g' }, { id: 'P13', texto: '¿Crees en el poder del amor y la pasión para guiar tus acciones?', arquetipo: 'c' }, { id: 'P14', texto: '¿Confías en tu intuición y en tu capacidad para que las cosas sucedan?', arquetipo: 'h' }, { id: 'P15', texto: '¿Te identificas con la lucha por la justicia y la defensa de los débiles?', arquetipo: 'a' }, { id: 'P16', texto: '¿Mantienes una actitud optimista y confías en la bondad de los demás?', arquetipo: 'f' }, { id: 'P17', texto: '¿El análisis y la reflexión son cruciales antes de tomar una decisión?', arquetipo: 'd' }, { id: 'P18', texto: '¿Te sientes lleno de energía cuando enfrentas un desafío competitivo?', arquetipo: 'a' }, { id: 'P19', texto: '¿Sientes una profunda curiosidad por entender cómo funciona el mundo?', arquetipo: 'h' }, { id: 'P20', texto: '¿La belleza, la estética y la sensualidad son importantes en tu vida?', arquetipo: 'c' }, { id: 'P21', texto: '¿Sueñas con crear una obra (artística, empresarial, etc.) que deje un legado?', arquetipo: 'b' }, { id: 'P22', texto: '¿Buscas la libertad y la independencia en todos los aspectos de tu vida?', arquetipo: 'e' }, { id: 'P23', texto: '¿Crees que las reglas y el orden son esenciales para una sociedad funcional?', arquetipo: 'g' }, { id: 'P24', texto: '¿Tiendes a ver el lado bueno de las cosas y a esperar un final feliz?', arquetipo: 'f' }, { id: 'P25', texto: '¿Te consideras un maestro o mentor para otras personas?', arquetipo: 'd' }, { id: 'P26', texto: '¿Estás dispuesto a sacrificarte para proteger a quienes amas?', arquetipo: 'a' }, { id: 'P27', texto: '¿Te atrae el misterio y lo que no se ve a simple vista?', arquetipo: 'h' }, { id: 'P28', texto: '¿Valoras las relaciones íntimas y cercanas por encima de los logros materiales?', arquetipo: 'c' }, { id: 'P29', texto: '¿La autoexpresión a través de alguna forma de arte o creación es vital para ti?', arquetipo: 'b' }, { id: 'P30', texto: '¿Sientes un llamado a viajar y experimentar diferentes culturas?', arquetipo: 'e' }, { id: 'P31', texto: '¿Asumes el control de las situaciones para garantizar el éxito?', arquetipo: 'g' }, { id: 'P32', texto: '¿Crees en la simplicidad y en encontrar la felicidad en las pequeñas cosas?', arquetipo: 'f' }, { id: 'P33', texto: '¿La búsqueda de la verdad y el conocimiento es una de tus mayores motivaciones?', arquetipo: 'd' }, { id: 'P34', texto: '¿Te ves a ti mismo como un pionero que abre nuevos caminos?', arquetipo: 'e' }, { id: 'P35', texto: '¿Tienes la habilidad de inspirar cambios profundos en los demás?', arquetipo: 'h' }, { id: 'P36', texto: '¿La lealtad y el compromiso son valores centrales en tus relaciones?', arquetipo: 'c' }, { id: 'P37', texto: '¿Tienes una visión clara de lo que quieres construir en tu futuro?', arquetipo: 'b' }, { id: 'P38', texto: '¿Te consideras una persona disciplinada y con autocontrol?', arquetipo: 'a' }, { id: 'P39', texto: '¿Te sientes más realizado cuando ejerces una posición de influencia y autoridad?', arquetipo: 'g' }, { id: 'P40', texto: '¿Crees que la fe y la esperanza pueden superar cualquier adversidad?', arquetipo: 'f' }
             ];
 
             const container = document.getElementById('preguntasContainer');
@@ -149,62 +110,57 @@
                 submitButton.disabled = true;
                 submitButton.textContent = 'Procesando...';
 
-                // --- 1. RECOLECTAR DATOS DEMOGRÁFICOS ---
-                const demograficos = {
-                    nombre: document.getElementById('nombre').value,
-                    email: document.getElementById('email').value,
-                    edad: document.getElementById('edad').value,
-                    ciudad: document.getElementById('ciudad').value
-                };
+                // --- 1. CREAR UN MAPA DE PREGUNTAS PARA BÚSQUEDA FÁCIL ---
+                const preguntasMap = new Map(preguntas.map(p => [p.id, p]));
 
-                // --- 2. PROCESAR RESULTADOS Y DETALLES ---
+                // --- 2. USAR FormData PARA LEER LOS DATOS DEL FORMULARIO DE FORMA CONFIABLE ---
+                const formData = new FormData(form);
+                
+                const demograficos = {};
                 const resultados = { a: 0, b: 0, c: 0, d: 0, e: 0, f: 0, g: 0, h: 0 };
                 const detalles = {};
 
-                // Itera sobre la lista de preguntas para asegurar que se procesan todas
-                preguntas.forEach(pregunta => {
-                    const preguntaId = pregunta.id;
-                    const arquetipo = pregunta.arquetipo;
-                    
-                    // Encuentra el radio button que fue seleccionado para esta pregunta
-                    const selectedRadio = document.querySelector(`input[name="${preguntaId}"]:checked`);
+                // --- 3. PROCESAR TODOS LOS DATOS DEL FORMULARIO ---
+                for (const [key, value] of formData.entries()) {
+                    // Si la clave es una pregunta (ej: 'P1', 'P2', etc.)
+                    if (preguntasMap.has(key)) {
+                        const pregunta = preguntasMap.get(key);
+                        const arquetipo = pregunta.arquetipo;
+                        const valorNum = parseInt(value, 10);
 
-                    if (selectedRadio) {
-                        const valor = parseInt(selectedRadio.value, 10);
-                        const respuestaLabel = document.querySelector(`label[for="${selectedRadio.id}"]`);
-                        const textoRespuesta = respuestaLabel ? respuestaLabel.innerText.trim() : `${valor}`;
-                        
-                        // Suma al puntaje total del arquetipo correspondiente
+                        // Sumar al puntaje del arquetipo
                         if (resultados.hasOwnProperty(arquetipo)) {
-                            resultados[arquetipo] += valor;
+                            resultados[arquetipo] += valorNum;
                         }
 
-                        // Guarda la respuesta detallada para el reporte
-                        detalles[preguntaId] = {
+                        // Guardar la respuesta detallada
+                        detalles[key] = {
                             pregunta: pregunta.texto,
-                            textoRespuesta: textoRespuesta,
-                            valor: valor
+                            textoRespuesta: value, // El valor seleccionado es la respuesta
+                            valor: valorNum
                         };
+                    } 
+                    // Si no es una pregunta, es un dato demográfico
+                    else {
+                        demograficos[key] = value;
                     }
-                });
+                }
                 
-                // Normalizar los resultados (cada arquetipo tiene 5 preguntas, max 50)
-                // Se divide por 5 para obtener una escala de 0 a 10
+                // --- 4. NORMALIZAR LOS RESULTADOS (DIVIDIR POR 5) ---
                 for (const arquetipo in resultados) {
                     resultados[arquetipo] = resultados[arquetipo] / 5;
                 }
 
-                // --- 3. CONSTRUIR EL OBJETO DE DATOS COMPLETO ---
+                // --- 5. CONSTRUIR EL OBJETO FINAL ---
                 const datosCompletos = {
                     demograficos,
                     resultados,
                     detalles
                 };
                 
-                // Guardar en sessionStorage para la página de resultados
                 sessionStorage.setItem('dpvperResultados', JSON.stringify(datosCompletos));
 
-                // --- 4. ENVIAR A LA API ---
+                // --- 6. ENVIAR A LA API ---
                 try {
                     const response = await fetch('/api/enviar-reporte-personal', {
                         method: 'POST',
@@ -213,7 +169,6 @@
                     });
 
                     if (response.ok) {
-                        // Asumo que tienes una página rdpvper.html para los resultados personales
                         window.location.href = `rdpvper.html`;
                     } else {
                         const errorData = await response.json();
