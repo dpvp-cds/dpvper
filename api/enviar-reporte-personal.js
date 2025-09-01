@@ -1,7 +1,7 @@
 import { db } from './lib/firebaseAdmin.js';
 import { Resend } from 'resend';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-import { Buffer } from 'buffer'; // Es una buena práctica incluirlo
+import { Buffer } from 'buffer';
 
 // Función para crear el PDF del reporte personal
 async function crearPDF(datos) {
@@ -72,6 +72,7 @@ export default async function handler(request, response) {
 
 
         // 3. Enviar correo con Resend
+        // -----  CORRECCIÓN DE LA VARIABLE DE ENTORNO APLICADA  -----
         const resend = new Resend(process.env.RESEND2_API_KEY);
         
         console.log(`Enviando correo a ${datosCompletos.demograficos.email} y copia a dpvp.cds@emcotic.com...`);
@@ -84,7 +85,6 @@ export default async function handler(request, response) {
           attachments: [
             {
               filename: `Reporte-DPvPer-${docRef.id}.pdf`,
-              // -----  AQUÍ ESTÁ LA CORRECCIÓN APLICADA -----
               content: Buffer.from(pdfBuffer),
             },
           ],
@@ -92,7 +92,6 @@ export default async function handler(request, response) {
 
         if (error) {
             console.error("Resend devolvió un error:", error);
-            // Lanza un error para que el bloque catch lo maneje
             throw new Error(error.message);
         }
 
