@@ -64,18 +64,33 @@
 
                 let html = '<div class="divide-y divide-gray-200">';
                 reportes.forEach(reporte => {
-                    // **ÚNICO CAMBIO REALIZADO AQUÍ**
-                    // Se asegura de convertir la fecha de Firestore correctamente.
-                    const fecha = reporte.fecha && reporte.fecha._seconds
-                        ? new Date(reporte.fecha._seconds * 1000).toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' })
-                        : 'Fecha inválida';
+                    
+                    // --- INICIO DE LA CORRECCIÓN A PRUEBA DE ERRORES ---
+
+                    // 1. Manejo seguro de la FECHA
+                    let fechaFormateada = 'Fecha no disponible';
+                    if (reporte.fecha && reporte.fecha._seconds) {
+                        const fechaObj = new Date(reporte.fecha._seconds * 1000);
+                        if (!isNaN(fechaObj)) {
+                            fechaFormateada = fechaObj.toLocaleString('es-CO', { dateStyle: 'long', timeStyle: 'short' });
+                        }
+                    }
+
+                    // 2. Manejo seguro de los NOMBRES
+                    let nombresMostrados = 'Nombres no disponibles';
+                    if (reporte.demograficos && reporte.demograficos.m1_nombre && reporte.demograficos.m2_nombre) {
+                        nombresMostrados = `${reporte.demograficos.m1_nombre} y ${reporte.demograficos.m2_nombre}`;
+                    }
+
+                    // --- FIN DE LA CORRECCIÓN ---
+
 
                     html += `
                         <a href="./reporte.html?id=${reporte.id}" class="report-item block p-4">
                             <div class="flex justify-between items-center">
                                 <div>
-                                    <p class="font-bold text-lg text-[#070404]">${reporte.demograficos.m1_nombre} y ${reporte.demograficos.m2_nombre}</p>
-                                    <p class="text-sm text-gray-500">Fecha: ${fecha}</p>
+                                    <p class="font-bold text-lg text-[#070404]">${nombresMostrados}</p>
+                                    <p class="text-sm text-gray-500">Fecha: ${fechaFormateada}</p>
                                 </div>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                             </div>
@@ -89,8 +104,8 @@
                 reportListDiv.classList.remove('hidden');
 
             } catch (error) {
-                console.error(error);
-                document.getElementById('loading').textContent = 'Error al cargar los reportes.';
+                console.error("Error fatal durante la carga de reportes:", error);
+                document.getElementById('loading').textContent = 'Error crítico al cargar los reportes. Revise la consola para más detalles.';
             }
         }
     </script>
