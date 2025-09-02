@@ -97,7 +97,7 @@ export default async function handler(request, response) {
     }
     try {
         const datosCompletos = request.body;
-        const docRef = await db.collection('reportes-personales').add({ ...datosCompletos, fecha: require("firebase-admin").firestore.Timestamp.now() });
+        const docRef = await db.collection('reportes-personales').add({ ...datosCompletos, fecha: admin.firestore.Timestamp.now() });
         const pdfBuffer = await crearPDF(datosCompletos);
         const resend = new Resend(process.env.RESEND2_API_KEY);
         
@@ -117,4 +117,5 @@ export default async function handler(request, response) {
         response.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
 }
+
 
