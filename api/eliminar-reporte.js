@@ -16,7 +16,7 @@ export default async function handler(req, res) {
 
     try {
         // 3. Usamos nuestra conexión 'db' y le damos la orden de borrar el documento con ese ID.
-        const docRef = db.collection('reportes_dpvper').doc(id);
+        const docRef = db.collection('reportes-personales').doc(id);
         await docRef.delete();
         
         // 4. Enviamos una respuesta de éxito de vuelta al portal.html para que sepa que la operación funcionó.
