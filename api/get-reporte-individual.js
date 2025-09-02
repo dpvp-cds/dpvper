@@ -14,7 +14,7 @@ export default async function handler(req, res) {
 
     try {
         // 3. Usamos nuestra conexión 'db' y le pedimos que busque el documento exacto con ese ID.
-        const docRef = db.collection('reportes_dpvper').doc(id);
+        const docRef = db.collection('reportes-personales').doc(id);
         const doc = await docRef.get();
 
         // 4. Si el documento no existe en la base de datos, devolvemos un error.
