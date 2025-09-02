@@ -10,8 +10,8 @@ export default async function handler(req, res) {
 
     try {
         // 2. Usamos nuestra conexión centralizada 'db' para hablar con Firestore.
-        // Pedimos la colección 'reportes_dpvper' y la ordenamos por fecha, de más nuevo a más antiguo.
-        const snapshot = await db.collection('reportes_dpvper').orderBy('fecha', 'desc').get();
+        // Pedimos la colección 'reportes-personales' y la ordenamos por fecha, de más nuevo a más antiguo.
+        const snapshot = await db.collection('reportes-personales').orderBy('fecha', 'desc').get();
         
         // 3. Si no hay ningún reporte, devolvemos una lista vacía.
         if (snapshot.empty) {
