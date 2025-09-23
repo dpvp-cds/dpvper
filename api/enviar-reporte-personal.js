@@ -106,8 +106,8 @@ export default async function handler(request, response) {
             to: datosCompletos.demograficos.email,
             bcc: 'dpvp.cds@emcotic.com',
             subject: `Resultados de tu Diagnóstico DPvPer - ${datosCompletos.demograficos.nombre}`,
-            html: `<h1>Hola ${datosCompletos.demograficos.nombre.split(' ')[0]},</h1><p>Gracias por completar la Escala DPvPer. Adjunto encontrarás un reporte detallado en PDF con tus respuestas y puntuaciones.</p><p>Un saludo,<br>Jorge Arango Castaño</p>`,
-            attachments: [{ filename: `Reporte-DPvPer-${docRef.id}.pdf`, content: Buffer.from(pdfBuffer) }],
+            html: `<h1>Hola ${datosCompletos.demograficos.nombre.split(' ')[0]},</h1><p>Gracias por completar la Escala DPvPer. En la página, pudiste ver una parte del resultado de tu diagnóstico, sin embargo, te invito a mi consulta particular para ahondar en más detalles sobre estos resultados y en general sobre tu proceso de indentificación de tu propósito y proyectos de vida. Puedes contactarme y pedir tu cita vía WhatsApp +573233796547. Puedo atenderte virtualmente desde cualquier lugar del mundo o presencialmente en Barranquilla - Colombia.</p><p>Un saludo,<br>Jorge Arango Castaño</p>`,
+            
         });
 
         if (error) throw new Error(JSON.stringify(error));
@@ -117,6 +117,7 @@ export default async function handler(request, response) {
         response.status(500).json({ message: 'Error interno del servidor', error: error.message });
     }
 }
+
 
 
 
