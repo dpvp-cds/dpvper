@@ -2,16 +2,16 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Tus Resultados - DPvPer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Profesional - DPvPer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     
     <!-- FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, query, orderBy, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const config = JSON.parse(window.__firebase_config || '{}');
         const app = initializeApp(config);
@@ -19,107 +19,107 @@
         const db = getFirestore(app);
         const appId = typeof window.__app_id !== 'undefined' ? window.__app_id : 'dpvper-app';
 
-        async function init() {
-            try {
-                // 1. Asegurar sesión
-                await signInAnonymously(auth);
-                
-                // 2. Obtener ID
-                const id = sessionStorage.getItem('reportId');
-                
-                // 3. Validación robusta antes de redirigir
-                if (!id || id === "undefined" || id === "") {
-                    console.warn("ID de reporte no válido. Redirigiendo al inicio.");
-                    window.location.href = 'index.html';
+        onAuthStateChanged(auth, user => {
+            if (!user) window.location.href = 'terapeuta-login.html';
+            else cargarReportes();
+        });
+
+        function cargarReportes() {
+            const lista = document.getElementById('lista-pacientes');
+            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'reportes_personal'), orderBy('timestamp', 'desc'));
+            
+            onSnapshot(q, (snapshot) => {
+                lista.innerHTML = '';
+                if (snapshot.empty) {
+                    lista.innerHTML = '<div class="text-center p-12 text-gray-400 bg-white rounded-xl shadow-sm">No hay diagnósticos registrados.</div>';
                     return;
                 }
 
-                // 4. Escuchar cambios
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'reportes_personal', id);
-                
-                onSnapshot(docRef, (snap) => {
-                    if (snap.exists()) {
-                        const data = snap.data();
-                        if (data.status === 'completado') {
-                            render(data);
-                        }
-                    } else {
-                        console.error("El documento no existe.");
-                    }
-                }, (error) => {
-                    console.error("Error escuchando el documento:", error);
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const fecha = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleDateString() : '---';
+                    const nombre = data.demograficos?.nombre || 'Anónimo';
+                    const arquetipo = data.arquetipoDominante || 'Procesando...';
+                    
+                    const item = document.createElement('div');
+                    item.className = "bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all mb-4 flex flex-col md:flex-row justify-between items-center group";
+                    item.innerHTML = `
+                        <div class="flex items-center gap-5 w-full md:w-auto mb-4 md:mb-0">
+                            <div class="w-12 h-12 bg-[#F8F7F2] rounded-full flex items-center justify-center text-[#E8A613] font-bold text-xl border border-[#E8A613]">
+                                ${nombre.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-lg text-[#070404] group-hover:text-[#E8A613] transition-colors">${nombre}</h3>
+                                <p class="text-sm text-gray-500">${fecha} • <span class="font-medium text-gray-700">${arquetipo}</span></p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 w-full md:w-auto">
+                            <a href="rdpvper.html?id=${docSnap.id}" target="_blank" class="flex-1 md:flex-none text-center bg-[#070404] text-white px-5 py-2 rounded-full font-medium hover:bg-[#E8A613] hover:text-[#070404] transition-colors text-sm">
+                                Ver Detalle
+                            </a>
+                            <button onclick="eliminarReporte('${docSnap.id}', '${nombre}')" class="px-3 py-2 rounded-full border border-gray-200 text-gray-400 hover:border-red-500 hover:text-red-500 transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                            </button>
+                        </div>
+                    `;
+                    lista.appendChild(item);
                 });
-
-            } catch (err) {
-                console.error("Error crítico en inicialización:", err);
-                document.getElementById('loading').innerHTML = '<p class="text-red-500">Error cargando resultados. Por favor actualice.</p>';
-            }
+            });
         }
 
-        // Ejecutar con catch para evitar "Unhandled Rejection"
-        init().catch(e => console.error("Error global:", e));
+        window.eliminarReporte = async (id, nombre) => {
+            if(confirm(`¿Eliminar reporte de ${nombre}?`)) {
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'reportes_personal', id));
+                } catch (e) { alert("Error: " + e.message); }
+            }
+        };
 
-        function render(data) {
-            const loading = document.getElementById('loading');
-            const content = document.getElementById('content');
-            
-            if(loading) loading.classList.add('hidden');
-            if(content) content.classList.remove('hidden');
-            
-            if(data.demograficos && data.demograficos.nombre) {
-                document.getElementById('nombre').innerText = data.demograficos.nombre;
-            }
-            if(data.arquetipoDominante) {
-                document.getElementById('arquetipo').innerText = data.arquetipoDominante;
-            }
-
-            if(data.resultados) {
-                new Chart(document.getElementById('chart'), {
-                    type: 'radar',
-                    data: {
-                        labels: Object.keys(data.resultados),
-                        datasets: [{
-                            label: 'Perfil de Propósito',
-                            data: Object.values(data.resultados),
-                            backgroundColor: 'rgba(232, 166, 19, 0.5)',
-                            borderColor: '#E8A613',
-                            pointBackgroundColor: '#070404'
-                        }]
-                    },
-                    options: { 
-                        responsive: true,
-                        scales: { r: { suggestedMin: 0, suggestedMax: 10 } } 
-                    }
-                });
-            }
-        }
+        window.logout = () => signOut(auth);
     </script>
-    <style>body { font-family: 'Poppins'; background: #F8F7F2; color: #6B6661; }</style>
+
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #F8F7F2; color: #6B6661; }
+        h1, h2 { font-family: 'Playfair Display', serif; color: #070404; }
+    </style>
 </head>
 <body>
-    <div id="loading" class="h-screen flex items-center justify-center flex-col gap-4">
-        <div class="animate-spin h-12 w-12 border-4 border-[#E8A613] rounded-full border-t-transparent"></div>
-        <p class="text-[#070404] font-bold animate-pulse">Analizando respuestas...</p>
-    </div>
-    
-    <div id="content" class="hidden container mx-auto px-4 py-12">
-        <h1 class="text-3xl font-serif text-[#070404] text-center mb-8">Resultados de <span id="nombre">...</span></h1>
-        
-        <div class="bg-white p-8 rounded-2xl shadow-lg mb-8 text-center border-t-4 border-[#E8A613]">
-            <p class="text-sm uppercase tracking-widest text-gray-500">Tu Impulsor Dominante</p>
-            <h2 id="arquetipo" class="text-4xl font-bold text-[#070404] mt-2">...</h2>
+    <!-- HEADER UNIFICADO (Igual al Index) -->
+    <header class="bg-white py-4 shadow-sm sticky top-0 z-50">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <img src="logoprincipal.png" alt="Logo DPvPer" class="h-12">
+                <span class="bg-[#070404] text-white text-[10px] px-2 py-1 rounded uppercase tracking-wider font-bold">Portal Profesional</span>
+            </div>
+            <button onclick="window.logout()" class="text-sm font-medium text-gray-500 hover:text-[#E8A613] transition">
+                Cerrar Sesión
+            </button>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12 max-w-5xl">
+        <div class="flex justify-between items-end mb-10">
+            <div>
+                <h1 class="text-4xl font-bold mb-2 text-[#070404]">Pacientes</h1>
+                <p class="text-gray-500">Gestión de diagnósticos realizados</p>
+            </div>
+            <a href="index.html" target="_blank" class="text-[#E8A613] font-bold hover:underline flex items-center gap-1 text-sm">
+                + Nuevo Diagnóstico
+            </a>
         </div>
 
-        <div class="bg-white p-8 rounded-2xl shadow-lg">
-            <div class="relative h-80 w-full">
-                <canvas id="chart"></canvas>
+        <div id="lista-pacientes" class="space-y-4">
+            <div class="animate-pulse space-y-4">
+                <div class="h-24 bg-white rounded-xl border border-gray-100"></div>
+                <div class="h-24 bg-white rounded-xl border border-gray-100"></div>
             </div>
         </div>
-        
-        <div class="text-center mt-8 flex justify-center gap-4">
-            <button onclick="window.print()" class="bg-[#070404] text-white px-6 py-3 rounded-full hover:bg-[#E8A613] transition font-bold">Descargar PDF</button>
-            <a href="index.html" class="border-2 border-[#E8A613] text-[#E8A613] px-6 py-3 rounded-full hover:bg-[#E8A613] hover:text-white transition font-bold">Nuevo Test</a>
+    </main>
+    
+    <footer class="bg-[#070404] text-white py-12 mt-12">
+        <div class="container mx-auto text-center px-6">
+            <p class="text-gray-400">&copy; 2025 Jorge Arango Castaño - DPvPer.</p>
         </div>
-    </div>
+    </footer>
 </body>
 </html>
