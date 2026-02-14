@@ -1,236 +1,125 @@
 <!DOCTYPE html>
-<html lang="es" class="scroll-smooth">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resultados Preliminares DPvPer - Caminos del Ser</title>
+    <title>Tus Resultados - DPvPer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { font-family: 'Poppins', sans-serif; background-color: #F8F7F2; color: #6B6661; }
-        h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: #070404; }
-        .btn-brand { background-color: #E8A613; color: white; padding: 12px 30px; border-radius: 9999px; font-weight: 600; transition: all 0.3s ease; }
-        .btn-brand:hover { background-color: #d4940f; transform: translateY(-2px); }
-        .card { background-color: white; border-radius: 16px; padding: 2rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
-        .blurry-card {
-            position: relative;
-            overflow: hidden;
-            border: 2px dashed #d1d5db;
-        }
-        .blurry-card .content {
-            filter: blur(8px);
-            opacity: 0.5;
-            user-select: none;
-        }
-        .blurry-card .overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(2px);
-        }
-    </style>
-</head>
-<body class="leading-relaxed">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- FIREBASE -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    <header class="bg-white py-4 shadow-sm">
-        <div class="container mx-auto px-6 flex justify-between items-center">
-            <a href="index.html">
-                <img src="logoprincipal.png" alt="Logo DPvPer" class="h-12">
-            </a>
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="https://caminosdelser.co" class="text-gray-600 hover:text-[#E8A613]">Inicio</a>
-                <a href="BaseTeorica_PI.pdf" target="_blank" class="text-gray-600 hover:text-[#E8A613]">Base Teórica</a>
-                <a href="https://wa.me/573233796547" target="_blank" class="text-gray-600 hover:text-[#E8A613]">Contacto</a>
-            </div>
-        </div>
-    </header>
+        const config = JSON.parse(window.__firebase_config || '{}');
+        const app = initializeApp(config);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof window.__app_id !== 'undefined' ? window.__app_id : 'dpvper-app';
 
-    <main id="main-content" class="container mx-auto px-6 py-12">
-        <div id="vistaPublica">
-            <div class="text-center py-20">
-                <h1 class="text-3xl">Cargando tus resultados...</h1>
-            </div>
-        </div>
-    </main>
-
-    <footer class="bg-[#070404] text-white py-12">
-        <div class="container mx-auto text-center px-6">
-            <p class="text-gray-400">&copy; 2025 Jorge Arango Castaño - DPvPer.</p>
-            <a href="terapeuta-login.html" class="text-sm text-gray-400 hover:text-white transition-colors mt-2 inline-block">Acceso Terapeutas</a>
-        </div>
-    </footer>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const sessionData = sessionStorage.getItem('dpvperResultados');
-            const mainContent = document.getElementById('main-content');
-
-            if (!sessionData) {
-                mainContent.innerHTML = '<div class="text-center py-20"><h1 class="text-3xl text-red-600">No se encontraron resultados.</h1><p class="mt-4">Por favor, completa primero el cuestionario.</p><a href="index.html" class="btn-brand mt-6 inline-block">Ir al Cuestionario</a></div>';
-                return;
-            }
-
+        async function init() {
             try {
-                const datosCompletos = JSON.parse(sessionData);
-                procesarResultados(datosCompletos);
-            } catch (e) {
-                console.error("Error al procesar los datos:", e);
-                mainContent.innerHTML = '<h1 class="text-3xl text-center text-red-600">Hubo un error al procesar tus resultados.</h1>';
-            }
-        });
-
-        function procesarResultados(datosCompletos) {
-            const respuestas = datosCompletos.respuestas;
-            const demograficos = datosCompletos.demograficos;
-
-            const arquetiposInfo = {
-                a: { nombre: 'Analista / Sabio', descripcion: 'Tu motor es el conocimiento, la lógica y la búsqueda de la verdad. Encuentras sentido al entender el mundo, organizar sistemas y resolver problemas complejos.' },
-                b: { nombre: 'Creador / Innovador', descripcion: 'Tu energía proviene de la imaginación, la originalidad y la necesidad de dar forma a lo nuevo. Te sientes más vivo/a cuando creas, inventas o expresas una visión única.' },
-                c: { nombre: 'Conector / Humanista', descripcion: 'Encuentras tu propósito en la red de relaciones humanas. Tu fuerza radica en la empatía, en construir puentes entre personas y en fomentar la comunidad.' },
-                d: { nombre: 'Explorador', descripcion: 'Te impulsa un profundo anhelo de libertad, autonomía y nuevas experiencias. Tu propósito no es un destino, sino el viaje mismo: aprender y descubrir.' },
-                e: { nombre: 'Constructor / Contribuidor', descripcion: 'Tu motivación es el impacto tangible y el servicio a una causa más grande que tú. Eres una persona de acción que encuentra sentido al edificar y aportar de forma práctica.' },
-                f: { nombre: 'Sanador / Espiritual', descripcion: 'Tu energía se dirige hacia el mundo interior. Buscas la armonía, el equilibrio y la paz, tanto para ti como para los demás. Tu propósito se manifiesta al guiar a otros al bienestar.' }
-            };
-
-            const scores = { a: 0, b: 0, c: 0, d: 0, e: 0, f: 0 };
-            for (const pregunta in respuestas) {
-                const arquetipoVotado = respuestas[pregunta];
-                if (arquetipoVotado !== 'na') {
-                    scores[arquetipoVotado]++;
+                // 1. Asegurar sesión
+                await signInAnonymously(auth);
+                
+                // 2. Obtener ID
+                const id = sessionStorage.getItem('reportId');
+                
+                // 3. Validación robusta antes de redirigir
+                if (!id || id === "undefined" || id === "") {
+                    console.warn("ID de reporte no válido. Redirigiendo al inicio.");
+                    window.location.href = 'index.html';
+                    return;
                 }
+
+                // 4. Escuchar cambios
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'reportes_personal', id);
+                
+                onSnapshot(docRef, (snap) => {
+                    if (snap.exists()) {
+                        const data = snap.data();
+                        if (data.status === 'completado') {
+                            render(data);
+                        }
+                    } else {
+                        console.error("El documento no existe.");
+                    }
+                }, (error) => {
+                    console.error("Error escuchando el documento:", error);
+                });
+
+            } catch (err) {
+                console.error("Error crítico en inicialización:", err);
+                document.getElementById('loading').innerHTML = '<p class="text-red-500">Error cargando resultados. Por favor actualice.</p>';
             }
-
-            const sortedScores = Object.entries(scores).sort(([,a],[,b]) => b-a);
-            
-            const arquetipoPrimario = sortedScores[0];
-            const arquetipoSecundario = sortedScores[1];
-            const arquetipoTerciario = sortedScores[2];
-
-            mostrarVistaPublica(demograficos, scores, arquetipoPrimario, arquetipoSecundario, arquetipoTerciario, arquetiposInfo);
         }
 
-        function mostrarVistaPublica(demograficos, scores, primario, secundario, terciario, info) {
-            const vistaPublicaDiv = document.getElementById('vistaPublica');
+        // Ejecutar con catch para evitar "Unhandled Rejection"
+        init().catch(e => console.error("Error global:", e));
+
+        function render(data) {
+            const loading = document.getElementById('loading');
+            const content = document.getElementById('content');
             
-            const nombreSecundario = info[secundario[0]].nombre;
-            const descSecundario = info[secundario[0]].descripcion;
-
-            let html = `
-                <div class="text-center">
-                    <h1 class="text-4xl md:text-5xl">Hola, ${demograficos.nombre.split(' ')[0]}</h1>
-                    <p class="text-lg mt-2">Este es un avance de tu Diagnóstico DPvPer.</p>
-                </div>
-
-                <div class="card mt-10">
-                    <h2 class="text-3xl text-center mb-8">Un Vistazo a tu Mundo Interior</h2>
-                    <p class="text-center max-w-3xl mx-auto mb-10">Tus respuestas revelan un perfil único de motivaciones. Hemos identificado tus tres arquetipos principales. Como avance, te revelamos tu **arquetipo secundario**, la energía que colorea y da contexto a tu fuerza principal.</p>
-                    
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
-                        <!-- PRIMARIO BORROSO -->
-                        <div class="blurry-card text-center p-6 h-full">
-                            <div class="content">
-                                <h3 class="text-xl font-bold">Tu Arquetipo Primario</h3>
-                                <p class="text-4xl my-4">❓</p>
-                                <p>Esta es tu fuerza dominante, el motor principal de tu ser. Define tu "qué" más fundamental en la vida.</p>
-                            </div>
-                            <div class="overlay">
-                               <span class="text-center font-bold text-lg bg-gray-200 px-4 py-2 rounded-full shadow">🔒 Arquetipo Bloqueado</span>
-                            </div>
-                        </div>
-
-                        <!-- SECUNDARIO VISIBLE -->
-                        <div class="text-center p-6 border-4 border-[#E8A613] rounded-lg transform lg:scale-110 shadow-2xl z-10 bg-white h-full flex flex-col justify-center">
-                             <h3 class="text-xl font-bold text-gray-500">Tu Arquetipo Secundario</h3>
-                             <h4 class="text-3xl text-[#070404] mt-2">${nombreSecundario}</h4>
-                             <p class="mt-4">${descSecundario}</p>
-                        </div>
-
-                        <!-- TERCIARIO BORROSO -->
-                        <div class="blurry-card text-center p-6 h-full">
-                            <div class="content">
-                                <h3 class="text-xl font-bold">Tu Arquetipo Terciario</h3>
-                                <p class="text-4xl my-4">❓</p>
-                                <p>Esta es tu energía de apoyo. Representa el "para qué" de tus acciones y nutre a tus otras dos fuerzas.</p>
-                            </div>
-                             <div class="overlay">
-                               <span class="text-center font-bold text-lg bg-gray-200 px-4 py-2 rounded-full shadow">🔒 Arquetipo Bloqueado</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="card mt-10">
-                     <h2 class="text-3xl text-center mb-2">Tu Perfil de Motivaciones</h2>
-                     <p class="text-center max-w-3xl mx-auto mb-8">La gráfica muestra la intensidad de todas tus energías arquetípicas. Hemos resaltado tu arquetipo secundario para que veas su relación con las demás fuerzas que te definen.</p>
-                     <div class="chart-container" style="height: 350px; max-height: 400px;">
-                        <canvas id="radarChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="card mt-10 text-center bg-[#070404] text-white">
-                    <h2 class="text-3xl text-[#E8A613]">Descubre tu Perfil Completo</h2>
-                    <p class="mt-4 max-w-2xl mx-auto">Este avance es solo la punta del iceberg. El reporte completo revela tu arquetipo primario y terciario, analiza la interacción de todas tus fuerzas, identifica tus bloqueos específicos y te entrega una **"Fórmula de Propósito"** personalizada para empezar a construir una vida más alineada.</p>
-                    <a href="https://wa.me/573233796547?text=Hola%20Jorge,%20estoy%20interesado%20en%20conocer%20el%20resto%20de%20mis%20arquetipos%20para%20construir%20mi%20propósito%20de%20vida" target="_blank" class="btn-brand mt-8 inline-block">Contactar para recibir mi reporte completo</a>
-                </div>
-            `;
-
-            vistaPublicaDiv.innerHTML = html;
-
-            const archetypeOrder = ['a', 'b', 'c', 'd', 'e', 'f'];
-            const secondaryIndex = archetypeOrder.indexOf(secundario[0]);
+            if(loading) loading.classList.add('hidden');
+            if(content) content.classList.remove('hidden');
             
-            const pointColors = archetypeOrder.map((_, index) => index === secondaryIndex ? '#E8A613' : 'rgba(107, 114, 128, 0.4)');
-            const backgroundColors = archetypeOrder.map((_, index) => index === secondaryIndex ? 'rgba(232, 166, 19, 0.4)' : 'rgba(107, 114, 128, 0.1)');
-            const chartLabels = Object.values(info).map((a, index) => index === secondaryIndex ? a.nombre.split(' / ')[0] : '');
+            if(data.demograficos && data.demograficos.nombre) {
+                document.getElementById('nombre').innerText = data.demograficos.nombre;
+            }
+            if(data.arquetipoDominante) {
+                document.getElementById('arquetipo').innerText = data.arquetipoDominante;
+            }
 
-            const ctx = document.getElementById('radarChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: chartLabels,
-                    datasets: [{
-                        label: 'Tu Puntuación',
-                        data: Object.values(scores),
-                        backgroundColor: backgroundColors,
-                        borderColor: pointColors,
-                        pointBackgroundColor: pointColors,
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: pointColors,
-                        borderWidth: 2,
-                        pointRadius: 5
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
-                            grid: { color: 'rgba(0, 0, 0, 0.1)' },
-                            pointLabels: { 
-                                font: { size: 14, weight: 'bold' }, 
-                                color: '#070404'
-                            },
-                            ticks: { display: false, stepSize: 2 },
-                            suggestedMin: 0,
-                            suggestedMax: Math.max(...Object.values(scores)) + 1
-                        }
+            if(data.resultados) {
+                new Chart(document.getElementById('chart'), {
+                    type: 'radar',
+                    data: {
+                        labels: Object.keys(data.resultados),
+                        datasets: [{
+                            label: 'Perfil de Propósito',
+                            data: Object.values(data.resultados),
+                            backgroundColor: 'rgba(232, 166, 19, 0.5)',
+                            borderColor: '#E8A613',
+                            pointBackgroundColor: '#070404'
+                        }]
                     },
-                    plugins: { legend: { display: false } }
-                }
-            });
+                    options: { 
+                        responsive: true,
+                        scales: { r: { suggestedMin: 0, suggestedMax: 10 } } 
+                    }
+                });
+            }
         }
     </script>
+    <style>body { font-family: 'Poppins'; background: #F8F7F2; color: #6B6661; }</style>
+</head>
+<body>
+    <div id="loading" class="h-screen flex items-center justify-center flex-col gap-4">
+        <div class="animate-spin h-12 w-12 border-4 border-[#E8A613] rounded-full border-t-transparent"></div>
+        <p class="text-[#070404] font-bold animate-pulse">Analizando respuestas...</p>
+    </div>
+    
+    <div id="content" class="hidden container mx-auto px-4 py-12">
+        <h1 class="text-3xl font-serif text-[#070404] text-center mb-8">Resultados de <span id="nombre">...</span></h1>
+        
+        <div class="bg-white p-8 rounded-2xl shadow-lg mb-8 text-center border-t-4 border-[#E8A613]">
+            <p class="text-sm uppercase tracking-widest text-gray-500">Tu Impulsor Dominante</p>
+            <h2 id="arquetipo" class="text-4xl font-bold text-[#070404] mt-2">...</h2>
+        </div>
+
+        <div class="bg-white p-8 rounded-2xl shadow-lg">
+            <div class="relative h-80 w-full">
+                <canvas id="chart"></canvas>
+            </div>
+        </div>
+        
+        <div class="text-center mt-8 flex justify-center gap-4">
+            <button onclick="window.print()" class="bg-[#070404] text-white px-6 py-3 rounded-full hover:bg-[#E8A613] transition font-bold">Descargar PDF</button>
+            <a href="index.html" class="border-2 border-[#E8A613] text-[#E8A613] px-6 py-3 rounded-full hover:bg-[#E8A613] hover:text-white transition font-bold">Nuevo Test</a>
+        </div>
+    </div>
 </body>
 </html>
-
