@@ -1,4 +1,4 @@
-import { db } from './lib/firebaseAdmin.js';
+import { db } from '.api/lib/firebaseAdmin.js';
 
 export default async function handler(req, res) {
     // 1. Verificamos que la solicitud sea para BORRAR datos (DELETE).
