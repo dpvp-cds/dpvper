@@ -1,57 +1,51 @@
-import { db } from '..api/lib/firebaseAdmin.js';
-import jwt from 'jsonwebtoken';
-import cookie from 'cookie';
+import { db } from './lib/firebaseAdmin.js'; // Ruta corregida: ./lib
+import { verifyAuth } from './lib/authMiddleware.js'; // Ruta corregida: ./lib
 
-export default async function handler(request, response) {
-    // 1. Solo permitimos solicitudes POST (envío de datos)
-    if (request.method !== 'POST') {
-        return response.status(405).json({ message: 'Método no permitido' });
+export default async function handler(req, res) {
+    // 1. Solo permitimos el método DELETE
+    if (req.method !== 'DELETE') {
+        return res.status(405).json({ message: 'Método no permitido. Use DELETE.' });
+    }
+
+    // 2. Obtenemos el ID del reporte a eliminar desde la query string (?id=...)
+    const { id } = req.query;
+
+    if (!id) {
+        return res.status(400).json({ message: 'El ID del reporte es requerido.' });
     }
 
     try {
-        const { password } = request.body;
+        // 3. SEGURIDAD: Verificamos que sea un terapeuta logueado
+        // Si el token no es válido, verifyAuth lanzará un error y saltará al catch
+        verifyAuth(req);
+
+        // 4. BORRADO: Eliminamos el documento de la colección 'reportes_personal'
+        // Usamos la referencia al documento específico
+        const docRef = db.collection('reportes_personal').doc(id);
         
-        // 2. Leemos las "Llaves Maestras" del entorno seguro de Vercel
-        const correctPassword = process.env.LOGIN_PASS;
-        const jwtSecret = process.env.JWT_SECRET;
-
-        // Validación de seguridad del servidor
-        if (!correctPassword || !jwtSecret) {
-            console.error("CRÍTICO: Variables de entorno LOGIN_PASS o JWT_SECRET no están configuradas.");
-            return response.status(500).json({ message: 'Error de configuración en el servidor.' });
+        // Verificamos si existe antes de intentar borrarlo (opcional, pero buena práctica)
+        const doc = await docRef.get();
+        if (!doc.exists) {
+            return res.status(404).json({ message: 'El reporte no existe o ya fue eliminado.' });
         }
+
+        // Ejecutamos el borrado
+        await docRef.delete();
         
-        // 3. Verificamos la contraseña
-        if (password === correctPassword) {
-            // ¡Éxito! Creamos el "Pase de Acceso" (Token)
-            const token = jwt.sign(
-                { user: 'terapeuta_dpvper', role: 'admin' }, // Datos dentro del token
-                jwtSecret,             // Firma digital única
-                { expiresIn: '8h' }    // El pase vence en 8 horas (jornada laboral)
-            );
-
-            // 4. Empaquetamos el token en una Cookie Segura
-            const serializedCookie = cookie.serialize('authToken', token, {
-                httpOnly: true, // INVISIBLE para JavaScript (Anti-Robo XSS)
-                secure: process.env.NODE_ENV === 'production', // Solo viaja por HTTPS en producción
-                sameSite: 'strict', // Solo se envía si estás en tu propia página (Anti-CSRF)
-                maxAge: 8 * 60 * 60, // Dura 8 horas
-                path: '/', // Válida en todo el sitio
-            });
-
-            // 5. Enviamos la cookie al navegador
-            response.setHeader('Set-Cookie', serializedCookie);
-            
-            return response.status(200).json({ success: true, message: 'Acceso autorizado.' });
-        } else {
-            // Fallo de seguridad
-            return response.status(401).json({ success: false, message: 'Credenciales inválidas.' });
-        }
+        console.log(`Reporte ${id} eliminado correctamente por el terapeuta.`);
+        
+        // 5. Respuesta de éxito
+        return res.status(200).json({ message: 'Reporte eliminado con éxito.' });
 
     } catch (error) {
-        console.error("Error en el endpoint de autenticación:", error);
-        return response.status(500).json({ message: 'Error interno del servidor.' });
+        console.error(`Error al eliminar reporte ${id}:`, error);
+
+        // Manejo específico de errores de autenticación
+        if (error.message === 'Token de autenticación no encontrado.' || error.message === 'Token inválido o expirado.') {
+            return res.status(401).json({ message: 'No autorizado. Su sesión ha expirado.' });
+        }
+
+        // Error genérico del servidor
+        return res.status(500).json({ message: 'Error interno del servidor al eliminar el reporte.' });
     }
 }
-
-
