@@ -1,5 +1,5 @@
-import { db } from '../lib/firebaseAdmin.js'; // Importante: .js
-import { verifyAuth } from '../lib/authMiddleware.js'; // Importante: .js
+import { db } from './lib/firebaseAdmin.js'; // Ruta corregida: ./lib
+import { verifyAuth } from './lib/authMiddleware.js'; // Ruta corregida: ./lib
 
 export default async function handler(req, res) {
     // 1. Solo permitimos el método DELETE
