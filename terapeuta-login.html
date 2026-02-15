@@ -3,57 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Terapeuta - DPvPer</title>
+    <title>Acceso Terapeuta - DPvP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Poppins', sans-serif; background-color: #F8F7F2; color: #6B6661; }
         h1, h2, h3 { font-family: 'Playfair Display', serif; color: #070404; }
-        .btn-brand { background-color: #E8A613; color: white; padding: 12px 30px; border-radius: 9999px; font-weight: 600; transition: background-color 0.3s ease; }
-        .btn-brand:hover { background-color: #d4940f; }
-        .input-styled { border: 1px solid #d1d5db; border-radius: 8px; padding: 10px 15px; width: 100%; }
-        .card { background-color: white; border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .btn-brand { background-color: #E8A613; color: white; padding: 12px 30px; border-radius: 9999px; font-weight: 600; transition: background-color 0.3s ease; width: 100%; border: none; cursor: pointer; }
+        .btn-brand:hover { background-color: #d4940f; transform: translateY(-2px); }
+        .btn-brand:disabled { background-color: #ccc; cursor: not-allowed; transform: none; }
+        .input-styled { border: 1px solid #d1d5db; border-radius: 8px; padding: 12px 15px; width: 100%; outline: none; background: white; transition: border-color 0.3s; }
+        .input-styled:focus { border-color: #E8A613; }
+        .card { background-color: white; border-radius: 16px; padding: 2.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); max-width: 400px; width: 100%; }
     </style>
 </head>
-<body class="flex flex-col min-h-screen">
-    <header class="bg-white py-4 shadow-sm">
-        <div class="container mx-auto px-6 flex justify-center items-center">
-            <a href="index.html">
-                <img src="logoprincipal.png" alt="Logo DPvPer" class="h-12">
-            </a>
-        </div>
-    </header>
+<body class="min-h-screen flex items-center justify-center p-4">
 
-    <main class="flex-grow flex items-center justify-center p-6">
-        <div class="card w-full max-w-md mx-auto">
-            <h1 class="text-3xl text-center mb-6">Acceso Terapeuta</h1>
-            <form id="loginForm">
-                <div class="mb-4">
-                    <label for="password" class="block mb-2 font-medium">Contraseña</label>
-                    <input type="password" id="password" class="input-styled" required>
+    <div class="card border-t-4 border-[#E8A613]">
+        <div class="text-center mb-8">
+            <!-- LOGO IMAGEN RESTAURADO -->
+            <img src="logoprincipal.png" alt="Logo DPvPer" class="h-20 mx-auto mb-4 object-contain">
+            
+            <h1 class="text-2xl font-bold text-[#070404]">Acceso Profesional</h1>
+            <p class="text-sm text-gray-400 mt-1">Plataforma Segura de Gestión</p>
+        </div>
+
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label for="password" class="block mb-2 font-medium text-sm text-gray-700">Contraseña de Acceso</label>
+                <div class="relative">
+                    <input type="password" id="password" class="input-styled pr-10" required placeholder="••••••••">
+                    <!-- BOTÓN DE VISUALIZAR/OCULTAR -->
+                    <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-[#E8A613] transition-colors focus:outline-none">
+                        <!-- Icono Ojo (Mostrar) -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" id="eyeIcon">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        <!-- Icono Ojo Tachado (Ocultar) - Oculto por defecto -->
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" id="eyeOffIcon">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                        </svg>
+                    </button>
                 </div>
-                <div id="errorMessage" class="text-red-600 text-center mb-4 hidden">Contraseña incorrecta.</div>
-                <button type="submit" class="btn-brand w-full">Ingresar</button>
-            </form>
-        </div>
-    </main>
+            </div>
+            
+            <div id="errorMessage" class="text-red-500 text-sm text-center bg-red-50 p-3 rounded-lg border border-red-100 hidden">
+                Credenciales incorrectas. Verifique e intente de nuevo.
+            </div>
 
-    <footer class="bg-[#070404] text-white py-12">
-        <div class="container mx-auto text-center"><p class="text-gray-400">&copy; 2025 Jorge Arango Castaño - DPvPer.</p></div>
+            <button type="submit" id="btnSubmit" class="btn-brand shadow-lg">
+                Ingresar al Portal
+            </button>
+        </form>
+        
+        <div class="mt-8 text-center">
+            <a href="index.html" class="text-xs text-gray-400 hover:text-[#E8A613] transition-colors underline">Volver al inicio</a>
+        </div>
+    </div>
+
+    <footer class="fixed bottom-0 w-full text-center py-6 text-xs text-gray-400">
+        &copy; 2025 Jorge Arango Castaño - DPvPer.
     </footer>
 
     <script>
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
+        // Lógica para mostrar/ocultar contraseña
+        const togglePasswordBtn = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+        const eyeOffIcon = document.getElementById('eyeOffIcon');
+
+        togglePasswordBtn.addEventListener('click', () => {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            
+            // Alternar iconos
+            eyeIcon.classList.toggle('hidden');
+            eyeOffIcon.classList.toggle('hidden');
+        });
+
+        // Lógica de Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const password = document.getElementById('password').value;
+            
+            const btnSubmit = document.getElementById('btnSubmit');
             const errorMessage = document.getElementById('errorMessage');
-            // Esta contraseña es solo para el acceso visual. 
-            // La seguridad real debería manejarse con un sistema de autenticación robusto (ej. Firebase Auth).
-            if (password === 'Ja#020904') { 
-                sessionStorage.setItem('terapeutaAuth', 'true');
-                window.location.href = 'portal.html';
-            } else {
+            
+            // UI Feedback
+            btnSubmit.disabled = true;
+            btnSubmit.textContent = 'Verificando...';
+            errorMessage.classList.add('hidden');
+            passwordInput.classList.remove('border-red-500');
+
+            try {
+                // LLAMADA A LA API SEGURA
+                const response = await fetch('/api/authenticate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password: passwordInput.value })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.success) {
+                    // Éxito
+                    window.location.href = 'portal.html';
+                } else {
+                    // Error
+                    throw new Error(data.message || 'Error de autenticación');
+                }
+
+            } catch (error) {
+                console.error("Error de login:", error);
+                errorMessage.textContent = 'Acceso denegado. Verifique su contraseña.';
                 errorMessage.classList.remove('hidden');
+                passwordInput.classList.add('border-red-500');
+                btnSubmit.disabled = false;
+                btnSubmit.textContent = 'Ingresar al Portal';
             }
         });
     </script>
