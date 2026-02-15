@@ -1,4 +1,4 @@
-import { db } from '../lib/firebaseAdmin.js';
+import { db } from '..api/lib/firebaseAdmin.js';
 import jwt from 'jsonwebtoken';
 import cookie from 'cookie';
 
@@ -53,4 +53,5 @@ export default async function handler(request, response) {
         return response.status(500).json({ message: 'Error interno del servidor.' });
     }
 }
+
 
