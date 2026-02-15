@@ -1,60 +1,51 @@
-import { db } from '..api/lib/firebaseAdmin.js';
-import jwt from 'jsonwebtoken';
-import cookie from 'cookie';
+import { db } from './lib/firebaseAdmin.js'; // Ruta corregida: ./lib
+import { verifyAuth } from './lib/authMiddleware.js'; // Ruta corregida: ./lib
 
 export default async function handler(req, res) {
-    // 1. Solo permitimos GET (lectura)
-    if (req.method !== 'GET') {
-        return res.status(405).json({ message: 'Método no permitido' });
+    // 1. Solo permitimos el método DELETE
+    if (req.method !== 'DELETE') {
+        return res.status(405).json({ message: 'Método no permitido. Use DELETE.' });
     }
 
-    // 2. Extraemos el ID que queremos leer
+    // 2. Obtenemos el ID del reporte a eliminar desde la query string (?id=...)
     const { id } = req.query;
 
     if (!id) {
-        return res.status(400).json({ message: 'Se requiere el ID del reporte.' });
+        return res.status(400).json({ message: 'El ID del reporte es requerido.' });
     }
 
     try {
-        // 3. SEGURIDAD: Verificamos el "Pase de Acceso" (Cookie)
-        // Solo un terapeuta logueado debería poder leer reportes ajenos completos desde el portal
-        const cookies = cookie.parse(req.headers.cookie || '');
-        const token = cookies.authToken;
+        // 3. SEGURIDAD: Verificamos que sea un terapeuta logueado
+        // Si el token no es válido, verifyAuth lanzará un error y saltará al catch
+        verifyAuth(req);
 
-        if (!token) {
-            return res.status(401).json({ message: 'No autorizado. Debe iniciar sesión.' });
-        }
-
-        try {
-            jwt.verify(token, process.env.JWT_SECRET);
-        } catch (err) {
-            return res.status(401).json({ message: 'Sesión inválida o expirada.' });
-        }
-
-        // 4. CONSULTA A LA BÓVEDA
-        // Buscamos el documento específico por su ID
+        // 4. BORRADO: Eliminamos el documento de la colección 'reportes_personal'
+        // Usamos la referencia al documento específico
         const docRef = db.collection('reportes_personal').doc(id);
+        
+        // Verificamos si existe antes de intentar borrarlo (opcional, pero buena práctica)
         const doc = await docRef.get();
-
         if (!doc.exists) {
-            return res.status(404).json({ message: 'Reporte no encontrado.' });
+            return res.status(404).json({ message: 'El reporte no existe o ya fue eliminado.' });
         }
 
-        const data = doc.data();
-
-        // 5. RESPUESTA LIMPIA
-        // Formateamos la fecha si es necesario, o enviamos todo el objeto data
-        const reporte = {
-            id: doc.id,
-            ...data,
-            // Aseguramos que la fecha sea legible si viene como objeto Timestamp de Firestore
-            fechaLegible: data.timestamp ? data.timestamp.toDate().toLocaleString('es-CO') : 'Fecha desconocida'
-        };
-
-        return res.status(200).json(reporte);
+        // Ejecutamos el borrado
+        await docRef.delete();
+        
+        console.log(`Reporte ${id} eliminado correctamente por el terapeuta.`);
+        
+        // 5. Respuesta de éxito
+        return res.status(200).json({ message: 'Reporte eliminado con éxito.' });
 
     } catch (error) {
-        console.error(`Error al obtener reporte individual ${id}:`, error);
-        return res.status(500).json({ message: 'Error interno del servidor.' });
+        console.error(`Error al eliminar reporte ${id}:`, error);
+
+        // Manejo específico de errores de autenticación
+        if (error.message === 'Token de autenticación no encontrado.' || error.message === 'Token inválido o expirado.') {
+            return res.status(401).json({ message: 'No autorizado. Su sesión ha expirado.' });
+        }
+
+        // Error genérico del servidor
+        return res.status(500).json({ message: 'Error interno del servidor al eliminar el reporte.' });
     }
 }
