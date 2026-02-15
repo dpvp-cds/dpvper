@@ -1,4 +1,4 @@
-import { db } from '../lib/firebaseAdmin';
+import { db } from '../lib/firebaseAdmin.js';
 import jwt from 'jsonwebtoken';
 import cookie from 'cookie';
 
