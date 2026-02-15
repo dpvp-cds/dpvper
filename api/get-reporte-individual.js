@@ -1,51 +1,60 @@
-import { db } from './lib/firebaseAdmin.js';
+import { db } from '../lib/firebaseAdmin';
+import jwt from 'jsonwebtoken';
+import cookie from 'cookie';
 
 export default async function handler(req, res) {
-  // 1. Verificamos que la solicitud sea para OBTENER datos (GET).
-  if (req.method !== 'GET') {
-    return res.status(405).json({ message: 'Método no permitido' });
-  }
-
-  // 2. Extraemos el ID del reporte que nos pide el navegador desde la URL.
-  const { id } = req.query;
-
-  if (!id) {
-    return res.status(400).json({ message: 'El ID del reporte es requerido.' });
-  }
-
-  try {
-    // 3. Usamos nuestra conexión 'db' y le pedimos que busque el documento exacto con ese ID.
-    const docRef = db.collection('reportes-personales').doc(id);
-    const doc = await docRef.get();
-
-    // 4. Si el documento no existe en la base de datos, devolvemos un error.
-    if (!doc.exists) {
-      return res.status(404).json({ message: 'Reporte no encontrado.' });
+    // 1. Solo permitimos GET (lectura)
+    if (req.method !== 'GET') {
+        return res.status(405).json({ message: 'Método no permitido' });
     }
 
-    // 5. Si lo encontramos, preparamos los datos para enviarlos.
-    const data = doc.data();
+    // 2. Extraemos el ID que queremos leer
+    const { id } = req.query;
 
-    let fechaISO;
-    if (data.fecha && typeof data.fecha.toDate === 'function') {
-      fechaISO = data.fecha.toDate().toISOString();
-    } else if (typeof data.fecha === 'string') {
-      fechaISO = data.fecha;
-    } else {
-      fechaISO = null;
+    if (!id) {
+        return res.status(400).json({ message: 'Se requiere el ID del reporte.' });
     }
 
-    const responseData = {
-      id: doc.id,
-      ...data,
-      fecha: fechaISO
-    };
+    try {
+        // 3. SEGURIDAD: Verificamos el "Pase de Acceso" (Cookie)
+        // Solo un terapeuta logueado debería poder leer reportes ajenos completos desde el portal
+        const cookies = cookie.parse(req.headers.cookie || '');
+        const token = cookies.authToken;
 
-    // 6. Enviamos el reporte completo de vuelta a la página reporte-personal.html.
-    res.status(200).json(responseData);
+        if (!token) {
+            return res.status(401).json({ message: 'No autorizado. Debe iniciar sesión.' });
+        }
 
-  } catch (error) {
-    console.error(`Error al obtener reporte ${id}:`, error);
-    res.status(500).json({ message: 'Error interno del servidor.' });
-  }
+        try {
+            jwt.verify(token, process.env.JWT_SECRET);
+        } catch (err) {
+            return res.status(401).json({ message: 'Sesión inválida o expirada.' });
+        }
+
+        // 4. CONSULTA A LA BÓVEDA
+        // Buscamos el documento específico por su ID
+        const docRef = db.collection('reportes_personal').doc(id);
+        const doc = await docRef.get();
+
+        if (!doc.exists) {
+            return res.status(404).json({ message: 'Reporte no encontrado.' });
+        }
+
+        const data = doc.data();
+
+        // 5. RESPUESTA LIMPIA
+        // Formateamos la fecha si es necesario, o enviamos todo el objeto data
+        const reporte = {
+            id: doc.id,
+            ...data,
+            // Aseguramos que la fecha sea legible si viene como objeto Timestamp de Firestore
+            fechaLegible: data.timestamp ? data.timestamp.toDate().toLocaleString('es-CO') : 'Fecha desconocida'
+        };
+
+        return res.status(200).json(reporte);
+
+    } catch (error) {
+        console.error(`Error al obtener reporte individual ${id}:`, error);
+        return res.status(500).json({ message: 'Error interno del servidor.' });
+    }
 }
