@@ -21,7 +21,8 @@ export default async function handler(req, res) {
 
         // 4. BORRADO: Eliminamos el documento de la colección 'reportes_personal'
         // Usamos la referencia al documento específico
-        const docRef = db.collection('reportes_personal').doc(id);
+        const docRef = db.collection('reportes-personal').doc(id);
+        const docRef = db.collection('reportes_dpvper').doc(id);
         
         // Verificamos si existe antes de intentar borrarlo (opcional, pero buena práctica)
         const doc = await docRef.get();
