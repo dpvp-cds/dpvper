@@ -3,123 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Profesional - DPvPer</title>
+    <title>Tus Resultados - DPvPer</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     
-    <!-- FIREBASE -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, query, orderBy, onSnapshot, doc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        const config = JSON.parse(window.__firebase_config || '{}');
-        const app = initializeApp(config);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = typeof window.__app_id !== 'undefined' ? window.__app_id : 'dpvper-app';
-
-        onAuthStateChanged(auth, user => {
-            if (!user) window.location.href = 'terapeuta-login.html';
-            else cargarReportes();
-        });
-
-        function cargarReportes() {
-            const lista = document.getElementById('lista-pacientes');
-            const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'reportes_personal'), orderBy('timestamp', 'desc'));
-            
-            onSnapshot(q, (snapshot) => {
-                lista.innerHTML = '';
-                if (snapshot.empty) {
-                    lista.innerHTML = '<div class="text-center p-12 text-gray-400 bg-white rounded-xl shadow-sm">No hay diagnósticos registrados.</div>';
-                    return;
-                }
-
-                snapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    const fecha = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleDateString() : '---';
-                    const nombre = data.demograficos?.nombre || 'Anónimo';
-                    const arquetipo = data.arquetipoDominante || 'Procesando...';
-                    
-                    const item = document.createElement('div');
-                    item.className = "bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all mb-4 flex flex-col md:flex-row justify-between items-center group";
-                    item.innerHTML = `
-                        <div class="flex items-center gap-5 w-full md:w-auto mb-4 md:mb-0">
-                            <div class="w-12 h-12 bg-[#F8F7F2] rounded-full flex items-center justify-center text-[#E8A613] font-bold text-xl border border-[#E8A613]">
-                                ${nombre.charAt(0).toUpperCase()}
-                            </div>
-                            <div>
-                                <h3 class="font-bold text-lg text-[#070404] group-hover:text-[#E8A613] transition-colors">${nombre}</h3>
-                                <p class="text-sm text-gray-500">${fecha} • <span class="font-medium text-gray-700">${arquetipo}</span></p>
-                            </div>
-                        </div>
-                        <div class="flex gap-3 w-full md:w-auto">
-                            <a href="rdpvper.html?id=${docSnap.id}" target="_blank" class="flex-1 md:flex-none text-center bg-[#070404] text-white px-5 py-2 rounded-full font-medium hover:bg-[#E8A613] hover:text-[#070404] transition-colors text-sm">
-                                Ver Detalle
-                            </a>
-                            <button onclick="eliminarReporte('${docSnap.id}', '${nombre}')" class="px-3 py-2 rounded-full border border-gray-200 text-gray-400 hover:border-red-500 hover:text-red-500 transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                            </button>
-                        </div>
-                    `;
-                    lista.appendChild(item);
-                });
-            });
-        }
-
-        window.eliminarReporte = async (id, nombre) => {
-            if(confirm(`¿Eliminar reporte de ${nombre}?`)) {
-                try {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'reportes_personal', id));
-                } catch (e) { alert("Error: " + e.message); }
-            }
-        };
-
-        window.logout = () => signOut(auth);
-    </script>
-
     <style>
         body { font-family: 'Poppins', sans-serif; background-color: #F8F7F2; color: #6B6661; }
-        h1, h2 { font-family: 'Playfair Display', serif; color: #070404; }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; color: #070404; }
+        
+        .btn-brand { 
+            background-color: #E8A613; 
+            color: white; 
+            padding: 12px 30px; 
+            border-radius: 9999px; 
+            font-weight: 600; 
+            transition: all 0.3s ease; 
+            border: none;
+            cursor: pointer;
+        }
+        .btn-brand:hover { 
+            background-color: #d4940f; 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 12px rgba(232, 166, 19, 0.3);
+        }
+        
+        .card { 
+            background-color: white; 
+            border-radius: 16px; 
+            padding: 2rem; 
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); 
+            border: 1px solid #f0f0f0; 
+        }
+        
+        /* Animación de carga */
+        .loader {
+            border: 4px solid #e5e7eb;
+            border-radius: 50%;
+            border-top: 4px solid #E8A613;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
-<body>
-    <!-- HEADER UNIFICADO (Igual al Index) -->
-    <header class="bg-white py-4 shadow-sm sticky top-0 z-50">
+<body class="leading-relaxed">
+
+    <!-- BARRA DE NAVEGACIÓN (Idéntica al Index) -->
+    <nav class="bg-white py-4 shadow-sm sticky top-0 z-20">
         <div class="container mx-auto px-6 flex justify-between items-center">
-            <div class="flex items-center gap-4">
+            <a href="index.html">
                 <img src="logoprincipal.png" alt="Logo DPvPer" class="h-12">
-                <span class="bg-[#070404] text-white text-[10px] px-2 py-1 rounded uppercase tracking-wider font-bold">Portal Profesional</span>
-            </div>
-            <button onclick="window.logout()" class="text-sm font-medium text-gray-500 hover:text-[#E8A613] transition">
-                Cerrar Sesión
-            </button>
-        </div>
-    </header>
-
-    <main class="container mx-auto px-6 py-12 max-w-5xl">
-        <div class="flex justify-between items-end mb-10">
-            <div>
-                <h1 class="text-4xl font-bold mb-2 text-[#070404]">Pacientes</h1>
-                <p class="text-gray-500">Gestión de diagnósticos realizados</p>
-            </div>
-            <a href="index.html" target="_blank" class="text-[#E8A613] font-bold hover:underline flex items-center gap-1 text-sm">
-                + Nuevo Diagnóstico
             </a>
-        </div>
-
-        <div id="lista-pacientes" class="space-y-4">
-            <div class="animate-pulse space-y-4">
-                <div class="h-24 bg-white rounded-xl border border-gray-100"></div>
-                <div class="h-24 bg-white rounded-xl border border-gray-100"></div>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="https://caminosdelser.co" class="text-gray-600 hover:text-[#E8A613]">Inicio</a>
+                <a href="#" class="text-gray-600 hover:text-[#E8A613]">Base Teórica</a>
+                <a href="https://wa.me/573233796547" target="_blank" class="text-gray-600 hover:text-[#E8A613]">Contacto</a>
             </div>
         </div>
-    </main>
-    
-    <footer class="bg-[#070404] text-white py-12 mt-12">
-        <div class="container mx-auto text-center px-6">
-            <p class="text-gray-400">&copy; 2025 Jorge Arango Castaño - DPvPer.</p>
+    </nav>
+
+    <!-- PANTALLA DE CARGA -->
+    <div id="loading" class="min-h-screen flex flex-col items-center justify-center -mt-20">
+        <div class="loader mb-6"></div>
+        <h2 class="text-2xl font-bold text-[#070404] mb-2">Generando tu Mapa de Vida...</h2>
+        <p class="text-gray-500 text-sm">Analizando tus impulsores internos</p>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL (Oculto inicialmente) -->
+    <div id="content" class="hidden container mx-auto px-6 py-12 max-w-5xl">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- COLUMNA IZQ: PERFIL -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Tarjeta de Identidad -->
+                <div class="card bg-[#070404] text-white border-none relative overflow-hidden">
+                    <div class="absolute top-0 right-0 w-20 h-20 bg-[#E8A613] opacity-10 rounded-bl-full"></div>
+                    
+                    <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Informe Para</p>
+                    <h1 id="userName" class="text-2xl font-serif font-bold text-[#E8A613] mb-6 capitalize">...</h1>
+                    
+                    <div class="border-t border-gray-800 pt-6">
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Impulsor Dominante</p>
+                        <p id="userArchetype" class="text-2xl font-medium leading-tight text-white">...</p>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div class="space-y-3">
+                    <button onclick="window.print()" class="w-full bg-[#E8A613] text-white px-6 py-4 rounded-xl font-bold hover:bg-[#d4940f] transition-all shadow-lg flex items-center justify-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                        Descargar PDF
+                    </button>
+                    <a href="index.html" class="block w-full text-center border-2 border-gray-200 text-gray-500 px-6 py-3 rounded-xl font-bold hover:border-[#E8A613] hover:text-[#E8A613] transition-all">
+                        Nuevo Diagnóstico
+                    </a>
+                </div>
+            </div>
+
+            <!-- COLUMNA DER: GRÁFICO Y ANÁLISIS -->
+            <div class="lg:col-span-2">
+                <div class="card h-full flex flex-col">
+                    <div class="mb-6 flex justify-between items-end border-b border-gray-100 pb-4">
+                        <div>
+                            <h2 class="text-2xl font-bold text-[#070404]">Mapa de Propósito</h2>
+                            <p class="text-gray-500 text-sm">Visualización de tus áreas de fortaleza</p>
+                        </div>
+                        <div class="hidden md:block">
+                            <span class="text-xs bg-[#F8F7F2] text-[#E8A613] px-3 py-1 rounded-full font-bold uppercase tracking-wider">Escala Personal</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Contenedor del Gráfico -->
+                    <div class="flex-grow relative w-full flex items-center justify-center p-2" style="min-height: 400px;">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+
+                    <div class="mt-6 p-4 bg-[#F8F7F2] rounded-xl text-sm text-gray-600 border-l-4 border-[#E8A613]">
+                        <p><strong>Interpretación:</strong> Los puntos más alejados del centro en el gráfico representan tus motivadores naturales. Estas son las áreas donde fluyes con mayor facilidad y donde reside tu potencial de propósito.</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-[#070404] text-white py-12 mt-12 text-center">
+        <p class="text-gray-400 text-sm">&copy; 2025 Jorge Arango Castaño - Caminos del Ser.</p>
     </footer>
+
+    <script>
+        // LÓGICA DE PROCESAMIENTO CLIENTE (Visualización Inmediata)
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. Recuperar datos de la sesión (Lo que guardó el index.html)
+            const rawData = sessionStorage.getItem('dpvperResultados');
+            
+            if (!rawData) {
+                // Si no hay datos, redirigir al inicio para evitar errores
+                console.warn("No hay datos de sesión. Redirigiendo...");
+                window.location.href = 'index.html'; 
+                return;
+            }
+
+            try {
+                const datos = JSON.parse(rawData);
+                procesarYRenderizar(datos);
+            } catch (error) {
+                console.error("Error procesando datos:", error);
+                alert("Hubo un error al leer tus resultados. Por favor intenta realizar el test nuevamente.");
+                window.location.href = 'index.html';
+            }
+        });
+
+        function procesarYRenderizar(datos) {
+            // A. Calcular Resultados (Lógica Espejo de las 12 preguntas)
+            const respuestas = datos.respuestas || {};
+            const conteo = { a:0, b:0, c:0, d:0, e:0, f:0 };
+            
+            // Mapeo de Arquetipos (Según tu teoría implícita)
+            const ARQUETIPOS = {
+                'a': 'Racional / Analítico',
+                'b': 'Creativo / Innovador',
+                'c': 'Social / Conector',
+                'd': 'Estructural / Organizador',
+                'e': 'Acción / Hacedor',
+                'f': 'Espiritual / Introspectivo'
+            };
+
+            // Contar
+            Object.values(respuestas).forEach(val => {
+                if (conteo.hasOwnProperty(val)) conteo[val]++;
+            });
+
+            // Preparar datos para el gráfico
+            const labels = [];
+            const dataPoints = [];
+            let maxVal = -1;
+            let dominanteKey = '';
+
+            Object.keys(conteo).forEach(key => {
+                labels.push(ARQUETIPOS[key]);
+                // Escala visual: 12 preguntas en total. Multiplicamos para mejor visualización.
+                dataPoints.push(conteo[key]);
+                
+                if(conteo[key] > maxVal) {
+                    maxVal = conteo[key];
+                    dominanteKey = key;
+                }
+            });
+
+            // B. Renderizar en el DOM
+            document.getElementById('userName').textContent = datos.demograficos.nombre || "Usuario";
+            document.getElementById('userArchetype').textContent = ARQUETIPOS[dominanteKey] || "Equilibrado";
+
+            // C. Configurar Chart.js
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            
+            // Configuración de colores corporativos
+            const goldColor = '#E8A613';
+            const goldTransparent = 'rgba(232, 166, 19, 0.4)';
+            const blackColor = '#070404';
+
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Intensidad',
+                        data: dataPoints,
+                        backgroundColor: goldTransparent,
+                        borderColor: goldColor,
+                        borderWidth: 3,
+                        pointBackgroundColor: blackColor,
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: goldColor,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(0,0,0,0.05)' },
+                            grid: { color: 'rgba(0,0,0,0.05)' },
+                            pointLabels: {
+                                font: { 
+                                    family: "'Poppins', sans-serif", 
+                                    size: 11, 
+                                    weight: '600' 
+                                },
+                                color: '#4b5563' // Gray-600
+                            },
+                            ticks: { display: false, stepSize: 1 },
+                            suggestedMin: 0,
+                            suggestedMax: 5 // Ajustado para que se vea lleno con 12 preguntas
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: blackColor,
+                            titleFont: { family: "'Playfair Display', serif" },
+                            bodyFont: { family: "'Poppins', sans-serif" },
+                            padding: 10,
+                            cornerRadius: 8,
+                            displayColors: false
+                        }
+                    }
+                }
+            });
+
+            // D. Mostrar
+            setTimeout(() => {
+                document.getElementById('loading').classList.add('hidden');
+                document.getElementById('content').classList.remove('hidden');
+                // Scroll suave arriba
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 800); // Pequeño delay para UX
+        }
+    </script>
 </body>
 </html>
