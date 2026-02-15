@@ -2,59 +2,37 @@ import { db } from './lib/firebaseAdmin.js';
 import { verifyAuth } from './lib/authMiddleware.js';
 
 export default async function handler(req, res) {
-    // 1. Solo permitimos el método GET (Lectura)
     if (req.method !== 'GET') {
-        return res.status(405).json({ message: 'Método no permitido. Use GET.' });
+        return res.status(405).json({ message: 'Método no permitido' });
     }
 
     try {
-        // 2. SEGURIDAD: El guardián verifica la cookie
-        // Si no hay sesión válida, esto lanza un error y salta al catch
+        // 1. Verificamos la sesión del terapeuta
         verifyAuth(req);
 
-        // 3. CONSULTA A LA BÓVEDA
-        // Traemos todos los reportes ordenados por fecha
+        // 2. Buscamos directamente en la colección raíz
         const snapshot = await db.collection('reportes_personal')
             .orderBy('timestamp', 'desc')
             .get();
 
-        // Si no hay nada, devolvemos array vacío
         if (snapshot.empty) {
             return res.status(200).json({ reportes: [] });
         }
 
-        // 4. PREPARAR DATOS (Mapeo)
-        // Convertimos los documentos complejos de Firebase en objetos JSON simples para el frontend
         const reportes = snapshot.docs.map(doc => {
             const data = doc.data();
-            
-            // Manejo seguro de fechas (Firestore Timestamp -> String)
-            let fechaLegible = 'Fecha desconocida';
-            if (data.timestamp && typeof data.timestamp.toDate === 'function') {
-                fechaLegible = data.timestamp.toDate().toISOString(); 
-            } else if (data.fecha) {
-                fechaLegible = data.fecha;
-            }
-
             return {
                 id: doc.id,
                 nombre: data.demograficos?.nombre || 'Anónimo',
-                fecha: fechaLegible,
-                arquetipo: data.arquetipoDominante || 'Procesando...'
+                fecha: data.fecha || 'Sin fecha',
+                arquetipo: data.arquetipoDominante || 'N/A'
             };
         });
 
-        // 5. ENVIAR RESPUESTA
         return res.status(200).json({ reportes });
 
     } catch (error) {
-        console.error("Error al obtener lista de reportes:", error);
-
-        // Manejo de errores de autenticación específicos del middleware
-        if (error.message.includes('Token')) {
-            return res.status(401).json({ message: 'Sesión expirada o inválida. Por favor ingrese nuevamente.' });
-        }
-
-        return res.status(500).json({ message: 'Error interno del servidor.' });
+        console.error("Error en get-reportes:", error.message);
+        return res.status(401).json({ message: 'Sesión inválida o expirada.' });
     }
 }
