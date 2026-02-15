@@ -1,5 +1,5 @@
-import { db } from './lib/firebaseAdmin.js'; // Ruta corregida: ./lib
-import { verifyAuth } from './lib/authMiddleware.js'; // Ruta corregida: ./lib
+import { db } from './lib/firebaseAdmin.js'; 
+import { verifyAuth } from './lib/authMiddleware.js';
 
 export default async function handler(req, res) {
     // 1. Solo permitimos el método DELETE
@@ -7,46 +7,37 @@ export default async function handler(req, res) {
         return res.status(405).json({ message: 'Método no permitido. Use DELETE.' });
     }
 
-    // 2. Obtenemos el ID del reporte a eliminar desde la query string (?id=...)
-    const { id } = req.query;
+    // 2. Extraemos ID y Colección de los parámetros de la URL
+    const { id, coleccion } = req.query;
 
-    if (!id) {
-        return res.status(400).json({ message: 'El ID del reporte es requerido.' });
+    if (!id || !coleccion) {
+        return res.status(400).json({ message: 'El ID y la colección son obligatorios para eliminar.' });
     }
 
     try {
-        // 3. SEGURIDAD: Verificamos que sea un terapeuta logueado
-        // Si el token no es válido, verifyAuth lanzará un error y saltará al catch
+        // 3. SEGURIDAD: Verificar sesión del terapeuta
         verifyAuth(req);
 
-        // 4. BORRADO: Eliminamos el documento de la colección 'reportes_personal'
-        // Usamos la referencia al documento específico
-        const docRef = db.collection('reportes-personal').doc(id);
-        const docRef = db.collection('reportes_dpvper').doc(id);
-        
-        // Verificamos si existe antes de intentar borrarlo (opcional, pero buena práctica)
-        const doc = await docRef.get();
-        if (!doc.exists) {
-            return res.status(404).json({ message: 'El reporte no existe o ya fue eliminado.' });
-        }
+        // 4. Ejecutar el borrado en Firestore
+        // Buscamos específicamente en la colección indicada por el portal
+        await db.collection(coleccion).doc(id).delete();
 
-        // Ejecutamos el borrado
-        await docRef.delete();
+        // 5. Confirmar éxito
+        console.log(`Reporte ${id} eliminado con éxito de la colección ${coleccion}.`);
         
-        console.log(`Reporte ${id} eliminado correctamente por el terapeuta.`);
-        
-        // 5. Respuesta de éxito
-        return res.status(200).json({ message: 'Reporte eliminado con éxito.' });
+        return res.status(200).json({ 
+            success: true, 
+            message: 'El registro ha sido eliminado permanentemente de la base de datos.' 
+        });
 
     } catch (error) {
-        console.error(`Error al eliminar reporte ${id}:`, error);
+        console.error("Error al eliminar el reporte:", error.message);
 
-        // Manejo específico de errores de autenticación
-        if (error.message === 'Token de autenticación no encontrado.' || error.message === 'Token inválido o expirado.') {
-            return res.status(401).json({ message: 'No autorizado. Su sesión ha expirado.' });
+        // Manejo de errores de autenticación
+        if (error.message.includes('Token')) {
+            return res.status(401).json({ message: 'Sesión inválida. Acceso denegado.' });
         }
 
-        // Error genérico del servidor
-        return res.status(500).json({ message: 'Error interno del servidor al eliminar el reporte.' });
+        return res.status(500).json({ message: 'Error interno al intentar eliminar el registro.' });
     }
 }
