@@ -12,165 +12,86 @@
     <style>
         body { font-family: 'Poppins', sans-serif; background-color: #F8F7F2; color: #6B6661; }
         h1, h2, h3 { font-family: 'Playfair Display', serif; color: #070404; }
-        
-        .btn-brand { 
-            background-color: #E8A613; 
-            color: white; 
-            padding: 12px 30px; 
-            border-radius: 9999px; 
-            font-weight: 600; 
-            transition: all 0.3s ease; 
-            border: none;
-            cursor: pointer;
-        }
-        .btn-brand:hover { background-color: #d4940f; transform: translateY(-2px); }
-        .btn-brand:disabled { background-color: #f3d484; cursor: not-allowed; transform: none; }
-        
-        .input-styled { 
-            border: 1px solid #d1d5db; 
-            border-radius: 8px; 
-            padding: 12px 15px; 
-            width: 100%; 
-            outline: none;
-            background-color: white;
-        }
+        .btn-brand { background-color: #E8A613; color: white; padding: 12px 30px; border-radius: 9999px; font-weight: 600; transition: all 0.3s ease; border: none; cursor: pointer; }
+        .btn-brand:hover { background-color: #d4940f; transform: translateY(-2px); box-shadow: 0 4px 12px rgba(232, 166, 19, 0.3); }
+        .btn-brand:disabled { background-color: #f3d484; cursor: not-allowed; transform: none; box-shadow: none; }
+        .input-styled { border: 1px solid #d1d5db; border-radius: 8px; padding: 10px 15px; width: 100%; outline: none; background-color: white; }
         .input-styled:focus { border-color: #E8A613; box-shadow: 0 0 0 2px rgba(232, 166, 19, 0.1); }
-        
-        .card { 
-            background-color: white; 
-            border-radius: 16px; 
-            padding: 2rem; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05); 
-            margin-bottom: 2rem;
-        }
-
-        .question-card { margin-bottom: 2rem; border-bottom: 1px solid #f3f4f6; padding-bottom: 2rem; }
+        .card { background-color: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .question-card { margin-bottom: 2.5rem; padding-bottom: 2rem; border-bottom: 1px solid #f0f0f0; }
         .question-card:last-child { border-bottom: none; }
-
-        .option-label { 
-            display: block; 
-            padding: 1rem; 
-            border: 1px solid #d1d5db; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            transition: all 0.2s ease-in-out; 
-            margin-bottom: 0.5rem;
-        }
-        .option-label:hover { border-color: #E8A613; }
-        input[type="radio"]:checked + .option-label { 
-            border-color: #E8A613; 
-            background-color: #fef9f0; 
-            box-shadow: 0 0 0 2px #E8A613; 
-        }
+        .option-label { display: block; padding: 1rem; border: 1px solid #d1d5db; border-radius: 12px; cursor: pointer; transition: all 0.2s ease-in-out; margin-bottom: 0.75rem; font-size: 0.95rem; }
+        .option-label:hover { border-color: #E8A613; background-color: #fffcf5; }
+        input[type="radio"]:checked + .option-label { border-color: #E8A613; background-color: #fef9f0; box-shadow: 0 0 0 2px #E8A613; color: #070404; font-weight: 500; }
         input[type="radio"] { display: none; }
         .hidden { display: none; }
     </style>
 </head>
-<body class="leading-relaxed">
+<body>
 
-    <!-- BARRA DE NAVEGACIÓN -->
-    <nav class="bg-white py-4 shadow-sm sticky top-0 z-20">
+    <!-- NAVEGACIÓN -->
+    <nav class="bg-white py-4 shadow-sm sticky top-0 z-50">
         <div class="container mx-auto px-6 flex justify-between items-center">
             <a href="index.html">
                 <img src="logoprincipal.png" alt="Logo DPvPer" class="h-12 object-contain">
             </a>
-            <div class="hidden md:flex items-center space-x-8">
-                <a href="https://caminosdelser.co" class="text-gray-600 hover:text-[#E8A613]">Inicio</a>
-                <a href="#" class="text-gray-600 hover:text-[#E8A613]">Base Teórica</a>
-                <a href="https://wa.me/573233796547" target="_blank" class="text-gray-600 hover:text-[#E8A613]">Contacto</a>
+            <div class="hidden md:flex items-center space-x-8 text-sm font-medium">
+                <a href="https://caminosdelser.co" class="text-gray-500 hover:text-[#E8A613]">Inicio</a>
+                <a href="https://wa.me/573233796547" target="_blank" class="text-gray-500 hover:text-[#E8A613]">Contacto</a>
             </div>
         </div>
     </nav>
 
-    <!-- HERO -->
-    <section id="hero-section" class="text-center py-20 lg:py-32 px-6 bg-white">
-        <h1 class="text-4xl md:text-6xl font-bold mb-4">Descubre tu Propósito de Vida.</h1>
-        <p class="text-lg md:text-xl max-w-3xl mx-auto mb-8">La Escala DPvPer es una herramienta de autodescubrimiento diseñada para ayudarte a identificar tus impulsores internos y encontrar tu brújula personal.</p>
-    </section>
-
-    <main class="container mx-auto px-6 pb-12">
-        <form id="dpvperForm" novalidate>
-            
-            <!-- PASO 1: DEMOGRÁFICOS -->
-            <div id="demographics-wrapper">
-                <section class="card mb-12">
-                    <h2 class="text-3xl mb-6 border-b pb-4">Paso 1: Comencemos por conocerte</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div><label class="font-medium block mb-2">Nombre Completo</label><input type="text" id="nombre" class="input-styled" required></div>
-                        <div><label class="font-medium block mb-2">Correo Electrónico</label><input type="email" id="email" class="input-styled" required></div>
-                        <div><label class="font-medium block mb-2">Edad</label><input type="number" id="edad" class="input-styled" min="15" required></div>
-                        
-                        <div>
-                            <label class="font-medium block mb-2">País de Residencia</label>
-                            <select id="pais" class="input-styled" required>
-                                <option value="">Selecciona tu país...</option>
-                                <option value="Colombia">Colombia</option>
-                                <option value="México">México</option>
-                                <option value="Estados Unidos">Estados Unidos</option>
-                                <option value="España">España</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="font-medium block mb-2">Nivel Educativo</label>
-                            <select id="nivel_educativo" class="input-styled" required>
-                                <option value="">Selecciona...</option>
-                                <option value="Secundaria">Secundaria</option>
-                                <option value="Técnico">Técnico</option>
-                                <option value="Universitario">Universitario</option>
-                                <option value="Postgrado">Postgrado</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="font-medium block mb-2">Situación Laboral</label>
-                            <select id="situacion_laboral" class="input-styled" required>
-                                <option value="">Selecciona...</option>
-                                <option value="Empleado">Empleado</option>
-                                <option value="Independiente">Independiente</option>
-                                <option value="Estudiante">Estudiante</option>
-                                <option value="Desempleado">Desempleado</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="font-medium block mb-2">Situación Sentimental</label>
-                            <select id="situacion_sentimental" class="input-styled" required>
-                                <option value="">Selecciona...</option>
-                                <option value="Soltero">Soltero/a</option>
-                                <option value="Casado">Casado/a</option>
-                                <option value="Union Libre">Unión Libre</option>
-                                <option value="Divorciado">Divorciado/a</option>
-                            </select>
-                        </div>
-                        <div><label class="font-medium block mb-2">Número de Hijos</label><input type="number" id="hijos" class="input-styled" placeholder="0" min="0" required></div>
-                        <div>
-                            <label class="font-medium block mb-2">Mascotas</label>
-                            <select id="mascotas" class="input-styled" required>
-                                <option value="">Selecciona...</option>
-                                <option value="No tengo">No tengo</option>
-                                <option value="Si tengo">Sí tengo</option>
-                            </select>
-                        </div>
+    <main class="container mx-auto px-6 py-12 max-w-4xl">
+        
+        <form id="dpvperForm">
+            <!-- PASO 1: DATOS DEMOGRÁFICOS -->
+            <div id="step1" class="card mb-12 animate-fade-in">
+                <h2 class="text-3xl font-bold mb-6 border-b pb-4 text-[#E8A613]">Paso 1: Información Personal</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div><label class="block text-sm font-bold mb-2">Nombre Completo</label><input type="text" id="nombre" class="input-styled" required></div>
+                    <div><label class="block text-sm font-bold mb-2">Correo Electrónico</label><input type="email" id="email" class="input-styled" required></div>
+                    <div><label class="block text-sm font-bold mb-2">Edad</label><input type="number" id="edad" class="input-styled" required min="12"></div>
+                    <div><label class="block text-sm font-bold mb-2">Profesión / Ocupación</label><input type="text" id="profesion" class="input-styled" required></div>
+                    <div>
+                        <label class="block text-sm font-bold mb-2">País de Residencia</label>
+                        <select id="pais" class="input-styled" required>
+                            <option value="">Selecciona...</option>
+                            <option value="Colombia">Colombia</option>
+                            <option value="México">México</option>
+                            <option value="España">España</option>
+                            <option value="Estados Unidos">Estados Unidos</option>
+                            <option value="Otro">Otro</option>
+                        </select>
                     </div>
-                    <div id="demographics-validation" class="text-red-600 text-center mt-4 hidden">Por favor, completa todos los campos correctamente.</div>
-                    <div class="text-center mt-6">
-                        <button type="button" id="start-questionnaire-button" class="btn-brand text-lg">Iniciar Diagnóstico</button>
+                    <div>
+                        <label class="block text-sm font-bold mb-2">Nivel Educativo</label>
+                        <select id="nivel_educativo" class="input-styled" required>
+                            <option value="">Selecciona...</option>
+                            <option value="Secundaria">Secundaria</option>
+                            <option value="Técnico">Técnico</option>
+                            <option value="Universitario">Universitario</option>
+                            <option value="Postgrado">Postgrado</option>
+                        </select>
                     </div>
-                </section>
+                </div>
+                <div class="text-center">
+                    <button type="button" id="btnNext" class="btn-brand text-lg px-12">Iniciar Cuestionario</button>
+                </div>
             </div>
 
-            <!-- PASO 2: CUESTIONARIO (12 PREGUNTAS) -->
-            <div id="cuestionario-wrapper" class="hidden">
-                <section id="cuestionario" class="card">
-                    <h2 class="text-3xl mb-2 border-b pb-4">Paso 2: Exploremos tu mundo interior</h2>
-                    <p class="mt-4 mb-6 text-base text-gray-500">Selecciona la opción que más resuene contigo.</p>
-                    
-                    <!-- PREGUNTAS -->
-                    <div class="space-y-8">
-                        
+            <!-- PASO 2: LAS 12 PREGUNTAS -->
+            <div id="step2" class="hidden">
+                <div class="card mb-8">
+                    <h2 class="text-3xl font-bold mb-4">Paso 2: Diagnóstico</h2>
+                    <p class="text-gray-500 mb-8 italic">Selecciona la opción que mejor describa tu realidad actual. No hay respuestas correctas o incorrectas.</p>
+
+                    <div id="questions-container">
+                        <!-- Pregunta 1 -->
                         <div class="question-card">
-                            <h3 class="text-xl mb-4 font-bold text-[#070404]">1. Cuando te sientes completamente absorto y lleno de energía, generalmente estás...</h3>
-                            <div class="space-y-2">
-                                <input type="radio" name="q1" id="q1a" value="a"><label for="q1a" class="option-label">a) Resolviendo un problema complejo o analizando datos.</label>
+                            <h3 class="text-xl font-bold mb-4">1. Cuando te sientes completamente absorto y lleno de energía, generalmente estás...</h3>
+                            <div class="grid grid-cols-1 gap-2">
+                                <input type="radio" name="q1" id="q1a" value="a" required><label for="q1a" class="option-label">a) Resolviendo un problema complejo o analizando datos.</label>
                                 <input type="radio" name="q1" id="q1b" value="b"><label for="q1b" class="option-label">b) Creando algo nuevo, ya sea artístico, escrito o una solución innovadora.</label>
                                 <input type="radio" name="q1" id="q1c" value="c"><label for="q1c" class="option-label">c) Conectando con personas, escuchando, enseñando o liderando un equipo.</label>
                                 <input type="radio" name="q1" id="q1d" value="d"><label for="q1d" class="option-label">d) Organizando, planificando o mejorando un sistema para hacerlo más eficiente.</label>
@@ -179,10 +100,11 @@
                             </div>
                         </div>
 
+                        <!-- Pregunta 2 -->
                         <div class="question-card">
-                            <h3 class="text-xl mb-4 font-bold text-[#070404]">2. ¿Cuál de estos valores es tu "no negociable" fundamental en la vida?</h3>
-                            <div class="space-y-2">
-                                <input type="radio" name="q2" id="q2a" value="a"><label for="q2a" class="option-label">a) Libertad: La capacidad de elegir tu propio camino.</label>
+                            <h3 class="text-xl font-bold mb-4">2. ¿Cuál de estos valores es tu "no negociable" fundamental en la vida?</h3>
+                            <div class="grid grid-cols-1 gap-2">
+                                <input type="radio" name="q2" id="q2a" value="a" required><label for="q2a" class="option-label">a) Libertad: La capacidad de elegir tu propio camino.</label>
                                 <input type="radio" name="q2" id="q2b" value="b"><label for="q2b" class="option-label">b) Seguridad: La estabilidad y el orden.</label>
                                 <input type="radio" name="q2" id="q2c" value="c"><label for="q2c" class="option-label">c) Crecimiento: El aprendizaje constante.</label>
                                 <input type="radio" name="q2" id="q2d" value="d"><label for="q2d" class="option-label">d) Conexión: Las relaciones profundas.</label>
@@ -190,175 +112,252 @@
                                 <input type="radio" name="q2" id="q2f" value="f"><label for="q2f" class="option-label">f) Impacto: Hacer una diferencia en algo más grande.</label>
                             </div>
                         </div>
-                        
-                        <!-- (Aquí insertas las preguntas 3 a 12 con el mismo formato) -->
-                        <!-- Para brevedad del código generado, el script manejará las 12 -->
-                        
+
+                        <!-- Pregunta 3 -->
                         <div class="question-card">
-                            <h3 class="text-xl mb-4 font-bold text-[#070404]">12. ¿De qué manera te gustaría que tu vida impactara positivamente a los demás?</h3>
-                            <div class="space-y-2">
-                                <input type="radio" name="q12" id="q12a" value="a"><label for="q12a" class="option-label">a) Sirviendo como un ejemplo de autenticidad.</label>
-                                <input type="radio" name="q12" id="q12b" value="b"><label for="q12b" class="option-label">b) Creando oportunidades para otros.</label>
-                                <input type="radio" name="q12" id="q12c" value="c"><label for="q12c" class="option-label">c) Generando un ambiente de alegría y amor.</label>
-                                <input type="radio" name="q12" id="q12d" value="d"><label for="q12d" class="option-label">d) Compartiendo mi conocimiento.</label>
-                                <input type="radio" name="q12" id="q12e" value="e"><label for="q12e" class="option-label">e) Dejando una obra que sea útil.</label>
-                                <input type="radio" name="q12" id="q12f" value="f"><label for="q12f" class="option-label">f) Aliviando el sufrimiento de otros.</label>
+                            <h3 class="text-xl font-bold mb-4">3. Al final de tu vida, ¿qué logro te haría sentir que todo valió la pena?</h3>
+                            <div class="grid grid-cols-1 gap-2">
+                                <input type="radio" name="q3" id="q3a" value="a" required><label for="q3a" class="option-label">a) Haber construido relaciones profundas y dejado una huella de amor.</label>
+                                <input type="radio" name="q3" id="q3b" value="b"><label for="q3b" class="option-label">b) Haber alcanzado la maestría en mi campo y ser reconocido.</label>
+                                <input type="radio" name="q3" id="q3c" value="c"><label for="q3c" class="option-label">c) Haber creado una empresa, un patrimonio o una obra tangible.</label>
+                                <input type="radio" name="q3" id="q3d" value="d"><label for="q3d" class="option-label">d) Haber vivido una vida de aventuras y máxima libertad.</label>
+                                <input type="radio" name="q3" id="q3e" value="e"><label for="q3e" class="option-label">e) Haber ayudado a muchas personas o resuelto un problema social.</label>
+                                <input type="radio" name="q3" id="q3f" value="f"><label for="q3f" class="option-label">f) Haber alcanzado un profundo estado de paz interior y sabiduría.</label>
                             </div>
                         </div>
 
+                        <!-- Pregunta 4 -->
+                        <div class="question-card">
+                            <h3 class="text-xl font-bold mb-4">4. Si no existieran el miedo ni las limitaciones económicas, tu principal impulso sería...</h3>
+                            <div class="grid grid-cols-1 gap-2">
+                                <input type="radio" name="q4" id="q4a" value="a" required><label for="q4a" class="option-label">a) Crear: Dedicarte al arte, la música, la escritura o la invención.</label>
+                                <input type="radio" name="q4" id="q4b" value="b"><label for="q4b" class="option-label">b) Explorar: Viajar por el mundo y aprender de otras culturas.</label>
+                                <input type="radio" name="q4" id="q4c" value="c"><label for="q4c" class="option-label">c) Ayudar: Fundar una organización benéfica o servir a otros.</label>
+                                <input type="radio" name="q4" id="q4d" value="d"><label for="q4d" class="option-label">d) Aprender: Estudiar sin parar e investigar temas profundos.</label>
+                                <input type="radio" name="q4" id="q4e" value="e"><label for="q4e" class="option-label">e) Construir: Emprender un negocio o liderar un gran proyecto.</label>
+                                <input type="radio" name="q4" id="q4f" value="f"><label for="q4f" class="option-label">f) Sanar: Trabajar en tu propio bienestar y ayudar a otros a encontrar equilibrio.</label>
+                            </div>
+                        </div>
+
+                        <!-- Pregunta 5 -->
+                        <div class="question-card">
+                            <h3 class="text-xl font-bold mb-4">5. La principal fuente de incoherencia en tu vida suele ser...</h3>
+                            <div class="grid grid-cols-1 gap-2">
+                                <input type="radio" name="q5" id="q5a" value="a" required><label for="q5a" class="option-label">a) Las expectativas de mi familia o mi pareja.</label>
+                                <input type="radio" name="q5" id="q5b" value="b"><label for="q5b" class="option-label">b) La presión social o la idea de "éxito" que impone la sociedad.</label>
+                                <input type="radio" name="q5" id="q5c" value="c"><label for="q5c" class="option-label">c) Mi propio perfeccionismo o mi miedo a no ser excelente.</label>
+                                <input type="radio" name="q5" id="q5d" value="d"><label for="q5d" class="option-label">d) La procrastinación, dejando lo importante para después.</label>
+                                <input type="radio" name="q5" id="q5e" value="e"><label for="q5e" class="option-label">e) El cansancio o la falta de energía para perseguir mis anhelos.</label>
+                                <input type="radio" name="q5" id="q5f" value="f"><label for="q5f" class="option-label">f) La duda sobre si realmente soy capaz o merecedor.</label>
+                            </div>
+                        </div>
+
+                        <!-- Pregunta 6 -->
+                        <div class="question-card">
+                            <h3 class="text-xl font-bold mb-4">6. ¿Qué creencia limitante resuena más contigo ante un gran cambio?</h3>
+                            <div class="grid grid-cols-1 gap-2">
+                                <input type="radio" name="q6" id="q6a" value="a" required><label for="q6a" class="option-label">a) "No tengo suficiente dinero/tiempo para empezar".</label>
+                                <input type="radio" name="q6" id="q6b" value="b"><label for="q6b" class="option-label">b) "Ya es demasiado tarde para cambiar de rumbo".</label>
+                                <input type="radio" name="q6" id="q6c" value="c"><label for="q6c" class="option-label">c) "Necesito un plan perfecto antes de dar el primer paso".</label>
+                                <input type="radio" name="q6" id="q6d" value="d"><label for="q6d" class="option-label">d) "Fracasar sería terrible, no podría soportar la decepción".</label>
+                                <input type="radio" name="q6" id="q6e" value="e"><label for="q6e" class="option-label">e) "Hay otros que son mucho mejores que yo en eso".</label>
+                                <input type="radio" name="q6" id="q6f" value="f"><label for="q6f" class="option-label">f) "Priorizar mis sueños es egoísta, tengo responsabilidades".</label>
+                            </div>
+                        </div>
+
+                        <!-- Pregunta 7 -->
+                        <div class="question-card">
+                            <h3 class="text-xl font-bold mb-4">7. De estos verbos, ¿cuál describe mejor la "acción" de tu propósito?</h3>
+                            <div class="grid grid-cols-1 gap-2">
+                                <input type="radio" name="q7" id="q7a" value="a" required><label for="q7a" class="option-label">a) Inspirar</label>
+                                <input type="radio" name="q7" id="q7b" value="b"><label for="q7b" class="option-label">b) Crear</label>
+                                <input type="radio" name="q7" id="q7c" value="c"><label for="q7c" class="option-label">c) Sanar</label>
+                                <input type="radio" name="q7" id="q7d" value="d"><label for="q7d" class="option-label">d) Organizar</label>
+                                <input type="radio" name="q7" id="q7e" value="e"><label for="q7e" class="option-label">e) Conectar</label>
+                                <input type="radio" name="q7" id="q7f" value="f"><label for="q7f" class="option-label">f) Descubrir</label>
+                            </div>
+                        </div>
+
+                        <!-- Pregunta 8 -->
+                        <div class="question-card">
+                            <h3 class="text-xl font-bold mb-4">8. ¿Cuál es tu forma natural de abordar un nuevo proyecto?</h3>
+                            <div class="grid grid-cols-1 gap-2">
+                                <input type="radio" name="q8" id="q8a" value="a" required><label for="q8a" class="option-label">a) Planificar meticulosamente cada paso antes de empezar.</label>
+                                <input type="radio" name="q8" id="q8b" value="b"><label for="q8b" class="option-label">b) Lanzarme a la acción y experimentar aprendiendo sobre la marcha.</label>
+                                <input type="radio" name="q8" id="q8c" value="c"><label for="q8c" class="option-label">c) Buscar a otras personas para colaborar y construir juntos.</label>
+                                <input type="radio" name="q8" id="q8d" value="d"><label for="q8d" class="option-label">d) Investigar y aprender todo lo posible sobre el tema primero.</label>
+                                <input type="radio" name="q8" id="q8e" value="e"><label for="q8e" class="option-label">e) Empezar con un pequeño prototipo o una versión de prueba.</label>
+                                <input type="radio" name="q8" id="q8f" value="f"><label for="q8f" class="option-label">f) Reflexionar internamente hasta tener una visión clara.</label>
+                            </div>
+                        </div>
+
+                        <!-- Pregunta 9 -->
+                        <div class="question-card">
+                            <h3 class="text-xl font-bold mb-4">9. Frente a un obstáculo inesperado, tu primera reacción suele ser...</h3>
+                            <div class="grid grid-cols-1 gap-2">
+                                <input type="radio" name="q9" id="q9a" value="a" required><label for="q9a" class="option-label">a) Analizar la situación fríamente para encontrar una solución lógica.</label>
+                                <input type="radio" name="q9" id="q9b" value="b"><label for="q9b" class="option-label">b) Buscar una ruta creativa o una forma no convencional de rodearlo.</label>
+                                <input type="radio" name="q9" id="q9c" value="c"><label for="q9c" class="option-label">c) Pedir consejo o ayuda a personas de confianza.</label>
+                                <input type="radio" name="q9" id="q9d" value="d"><label for="q9d" class="option-label">d) Detenerme a reflexionar sobre qué puedo aprender de esto.</label>
+                                <input type="radio" name="q9" id="q9e" value="e"><label for="q9e" class="option-label">e) Sentir la frustración, pero luego usarla como combustible.</label>
+                                <input type="radio" name="q9" id="q9f" value="f"><label for="q9f" class="option-label">f) Dar un paso atrás y re-evaluar si el objetivo es el correcto.</label>
+                            </div>
+                        </div>
+
+                        <!-- Pregunta 10 -->
+                        <div class="question-card">
+                            <h3 class="text-xl font-bold mb-4">10. La lección más importante de tus "fracasos" pasados es...</h3>
+                            <div class="grid grid-cols-1 gap-2">
+                                <input type="radio" name="q10" id="q10a" value="a" required><label for="q10a" class="option-label">a) El descubrimiento de una fortaleza interna que no conocía.</label>
+                                <input type="radio" name="q10" id="q10b" value="b"><label for="q10b" class="option-label">b) La importancia de la flexibilidad y la capacidad de adaptación.</label>
+                                <input type="radio" name="q10" id="q10c" value="c"><label for="q10c" class="option-label">c) Quiénes son las personas que me apoyan incondicionalmente.</label>
+                                <input type="radio" name="q10" id="q10d" value="d"><label for="q10d" class="option-label">d) Una mayor claridad sobre lo que realmente no quiero en mi vida.</label>
+                                <input type="radio" name="q10" id="q10e" value="e"><label for="q10e" class="option-label">e) Que soy mucho más resiliente de lo que pensaba.</label>
+                                <input type="radio" name="q10" id="q10f" value="f"><label for="q10f" class="option-label">f) Una habilidad o conocimiento práctico que solo el error me dio.</label>
+                            </div>
+                        </div>
+
+                        <!-- Pregunta 11 -->
+                        <div class="question-card">
+                            <h3 class="text-xl font-bold mb-4">11. ¿Qué actividad te "recarga las baterías" más efectivamente?</h3>
+                            <div class="grid grid-cols-1 gap-2">
+                                <input type="radio" name="q11" id="q11a" value="a" required><label for="q11a" class="option-label">a) Calma y silencio: meditar o pasar tiempo en la naturaleza.</label>
+                                <input type="radio" name="q11" id="q11b" value="b"><label for="q11b" class="option-label">b) Conexión social: tiempo de calidad con amigos o seres queridos.</label>
+                                <input type="radio" name="q11" id="q11c" value="c"><label for="q11c" class="option-label">c) Expresión creativa: pintar, escribir, tocar un instrumento.</label>
+                                <input type="radio" name="q11" id="q11d" value="d"><label for="q11d" class="option-label">d) Movimiento físico: deporte, bailar o caminar.</label>
+                                <input type="radio" name="q11" id="q11e" value="e"><label for="q11e" class="option-label">e) Estimulación intelectual: leer o tener conversaciones profundas.</label>
+                                <input type="radio" name="q11" id="q11f" value="f"><label for="q11f" class="option-label">f) El servicio: sentir que estoy siendo útil ayudando a alguien.</label>
+                            </div>
+                        </div>
+
+                        <!-- Pregunta 12 -->
+                        <div class="question-card">
+                            <h3 class="text-xl font-bold mb-4">12. ¿De qué manera te gustaría impactar positivamente a los demás?</h3>
+                            <div class="grid grid-cols-1 gap-2">
+                                <input type="radio" name="q12" id="q12a" value="a" required><label for="q12a" class="option-label">a) Sirviendo como un ejemplo de autenticidad y valentía.</label>
+                                <input type="radio" name="q12" id="q12b" value="b"><label for="q12b" class="option-label">b) Creando oportunidades para que otros crezcan.</label>
+                                <input type="radio" name="q12" id="q12c" value="c"><label for="q12c" class="option-label">c) Generando un ambiente de alegría, amor y apoyo.</label>
+                                <input type="radio" name="q12" id="q12d" value="d"><label for="q12d" class="option-label">d) Compartiendo mi conocimiento y sabiduría para guiar.</label>
+                                <input type="radio" name="q12" id="q12e" value="e"><label for="q12e" class="option-label">e) Dejando una obra que inspire o sea útil a futuras generaciones.</label>
+                                <input type="radio" name="q12" id="q12f" value="f"><label for="q12f" class="option-label">f) Aliviando el sufrimiento o contribuyendo a la sanación.</label>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- CAPTCHA -->
+                    <!-- CAPTCHA Y POLÍTICAS -->
                     <div class="mt-8 border-t pt-8">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
                             <div>
-                                <label class="font-medium block mb-2">Prueba de seguridad</label>
+                                <label class="font-medium block mb-2 text-sm">Prueba de seguridad</label>
                                 <div class="flex items-center space-x-4">
-                                    <div class="w-40 h-16 bg-gray-100 rounded-md flex items-center justify-center font-bold text-xl" id="captcha-text"></div>
+                                    <div class="w-32 h-12 bg-gray-100 rounded-lg flex items-center justify-center font-bold text-lg" id="captcha-text"></div>
                                     <input type="number" id="captcha-answer" class="input-styled w-24 text-center">
-                                    <button type="button" id="reload-captcha" class="text-sm text-[#E8A613] hover:underline">Recargar</button>
                                 </div>
                             </div>
-                            <div>
-                                <div class="flex items-start mt-6 md:mt-0">
-                                    <input id="politicas" type="checkbox" class="h-4 w-4 mt-1 accent-[#E8A613]">
-                                    <div class="ml-3 text-sm">
-                                        <label for="politicas" class="text-gray-600">He leído y acepto la <a href="#" class="text-[#E8A613] hover:underline">política de privacidad</a>.</label>
-                                    </div>
-                                </div>
+                            <div class="flex items-center">
+                                <input id="politicas" type="checkbox" class="h-5 w-5 accent-[#E8A613] mr-3">
+                                <label for="politicas" class="text-sm">Acepto la <a href="#" class="text-[#E8A613] hover:underline font-bold">política de privacidad</a>.</label>
                             </div>
                         </div>
                     </div>
 
-                    <div id="validation-message" class="text-red-600 text-center my-4 hidden font-bold">
-                        Por favor completa todas las preguntas, el captcha y acepta las políticas.
+                    <div class="text-center mt-12">
+                        <button id="btnSubmit" type="submit" class="btn-brand text-xl w-full md:w-auto px-16 py-4 shadow-xl" disabled>Finalizar y Ver Resultados</button>
                     </div>
-                    
-                    <div class="text-center mt-8">
-                        <button id="submit-button" type="submit" class="btn-brand text-lg w-full md:w-auto shadow-xl" disabled>Finalizar y Ver mis Resultados</button>
-                    </div>
-                </section>
+                </div>
             </div>
         </form>
     </main>
 
-    <footer class="bg-[#070404] text-white py-12 text-center">
-        <p class="text-gray-400">&copy; 2025 Jorge Arango Castaño - DPvPer.</p>
-        <a href="terapeuta-login.html" class="text-xs text-gray-500 hover:text-white mt-2 inline-block">Acceso Profesional</a>
+    <footer class="bg-[#070404] text-white py-12 text-center mt-20">
+        <p class="text-gray-500 text-sm mb-2">&copy; 2025 Jorge Arango Castaño - Caminos del Ser.</p>
+        <a href="terapeuta-login.html" class="text-xs text-gray-600 hover:text-white transition">Acceso Profesional</a>
     </footer>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const btnStart = document.getElementById('start-questionnaire-button');
-            const step1 = document.getElementById('demographics-wrapper');
-            const step2 = document.getElementById('cuestionario-wrapper');
+            const step1 = document.getElementById('step1');
+            const step2 = document.getElementById('step2');
+            const btnNext = document.getElementById('btnNext');
             const form = document.getElementById('dpvperForm');
-            const btnSubmit = document.getElementById('submit-button');
-            let captchaSum = 0;
-            
-            // 1. Validar Demográficos
-            btnStart.addEventListener('click', () => {
-                const inputs = step1.querySelectorAll('input, select');
-                let valid = true;
-                inputs.forEach(i => {
-                    if(!i.value) { i.classList.add('border-red-500'); valid = false; } 
-                    else { i.classList.remove('border-red-500'); }
-                });
+            const btnSubmit = document.getElementById('btnSubmit');
+            const pol = document.getElementById('politicas');
+            const captchaInput = document.getElementById('captcha-answer');
 
-                if(valid) {
-                    document.getElementById('demographics-validation').classList.add('hidden');
-                    step1.classList.add('hidden');
-                    step2.classList.remove('hidden');
-                    window.scrollTo(0,0);
-                } else {
-                    document.getElementById('demographics-validation').classList.remove('hidden');
-                }
-            });
-
-            // 2. Captcha
+            let captchaSum;
             function initCaptcha() {
                 const a = Math.floor(Math.random()*10), b = Math.floor(Math.random()*10);
                 captchaSum = a + b;
                 document.getElementById('captcha-text').innerText = `${a} + ${b} = ?`;
-                document.getElementById('captcha-answer').value = '';
             }
             initCaptcha();
-            document.getElementById('reload-captcha').addEventListener('click', initCaptcha);
 
-            // 3. Validar Final
-            function checkValidity() {
-                const ans = parseInt(document.getElementById('captcha-answer').value);
-                const pol = document.getElementById('politicas').checked;
-                // Nota: Aquí se podría validar también si todas las preguntas están respondidas
-                // para habilitar el botón visualmente.
-                if(ans === captchaSum && pol) {
-                    btnSubmit.disabled = false;
-                } else {
-                    btnSubmit.disabled = true;
+            // Navegar al paso 2
+            btnNext.addEventListener('click', () => {
+                const required = step1.querySelectorAll('input, select');
+                let valid = true;
+                required.forEach(i => {
+                    if(!i.value) { i.classList.add('border-red-500'); valid = false; }
+                    else i.classList.remove('border-red-500');
+                });
+                if(valid) {
+                    step1.classList.add('hidden');
+                    step2.classList.remove('hidden');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
-            }
-            document.getElementById('captcha-answer').addEventListener('input', checkValidity);
-            document.getElementById('politicas').addEventListener('change', checkValidity);
+            });
 
-            // 4. ENVÍO A API
+            // Validar botón final
+            const validate = () => {
+                const isPol = pol.checked;
+                const isCaptcha = parseInt(captchaInput.value) === captchaSum;
+                btnSubmit.disabled = !(isPol && isCaptcha);
+            };
+            pol.addEventListener('change', validate);
+            captchaInput.addEventListener('input', validate);
+
+            // Envío a la API
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                
-                // Verificar que las 12 preguntas tengan respuesta
-                // (Debes tener los inputs q1 a q12 en el HTML)
-                let allAnswered = true;
-                // IMPORTANTE: Asegúrate de pegar las preguntas 2 a 11 en el HTML arriba
-                // El script busca 'q1', 'q2'... 'q12'
-                for(let i=1; i<=12; i++) {
-                    if(!form.elements[`q${i}`]?.value) { allAnswered = false; break; }
-                }
-
-                if(!allAnswered) {
-                    document.getElementById('validation-message').textContent = "Faltan preguntas por responder.";
-                    document.getElementById('validation-message').classList.remove('hidden');
-                    return;
-                }
-
                 btnSubmit.disabled = true;
-                btnSubmit.textContent = "Procesando...";
+                btnSubmit.innerText = "Procesando...";
 
-                // Datos
-                const demograficos = {
-                    nombre: document.getElementById('nombre').value,
-                    email: document.getElementById('email').value,
-                    edad: document.getElementById('edad').value,
-                    pais: document.getElementById('pais').value,
-                    nivel_educativo: document.getElementById('nivel_educativo').value,
-                    situacion_laboral: document.getElementById('situacion_laboral').value,
-                    situacion_sentimental: document.getElementById('situacion_sentimental').value,
-                    hijos: document.getElementById('hijos').value,
-                    mascotas: document.getElementById('mascotas').value
+                const data = {
+                    demograficos: {
+                        nombre: document.getElementById('nombre').value,
+                        email: document.getElementById('email').value,
+                        edad: document.getElementById('edad').value,
+                        profesion: document.getElementById('profesion').value,
+                        pais: document.getElementById('pais').value,
+                        nivel_educativo: document.getElementById('nivel_educativo').value
+                    },
+                    respuestas: {}
                 };
 
-                const respuestas = {};
                 for(let i=1; i<=12; i++) {
-                    respuestas[`q${i}`] = form.elements[`q${i}`].value;
+                    const selected = form.querySelector(`input[name="q${i}"]:checked`);
+                    if(selected) data.respuestas[`q${i}`] = selected.value;
                 }
+
+                // Guardar local por si falla
+                sessionStorage.setItem('dpvperResultados', JSON.stringify(data));
 
                 try {
                     const response = await fetch('/api/enviar-reporte-personal', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ demograficos, respuestas })
+                        body: JSON.stringify(data)
                     });
 
-                    if (!response.ok) throw new Error("Error en servidor");
-                    
+                    if (!response.ok) throw new Error('Error en el servidor');
+
                     const result = await response.json();
-                    
                     sessionStorage.setItem('reportId', result.id);
                     window.location.href = 'rdpvper.html';
-                    
                 } catch (err) {
                     console.error(err);
-                    alert("Error de conexión.");
-                    btnSubmit.disabled = false;
-                    btnSubmit.textContent = "Finalizar y Ver mis Resultados";
+                    alert("Error de conexión. Se mostrará una vista previa local.");
+                    window.location.href = 'rdpvper.html';
                 }
             });
         });
