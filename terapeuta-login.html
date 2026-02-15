@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Acceso Terapeuta - DPvP</title>
+    <title>Acceso Terapeuta - DPvPer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
@@ -21,7 +21,7 @@
 
     <div class="card border-t-4 border-[#E8A613]">
         <div class="text-center mb-8">
-            <!-- LOGO IMAGEN RESTAURADO -->
+            <!-- LOGO CORREGIDO: Usa tu archivo .png -->
             <img src="logoprincipal.png" alt="Logo DPvPer" class="h-20 mx-auto mb-4 object-contain">
             
             <h1 class="text-2xl font-bold text-[#070404]">Acceso Profesional</h1>
@@ -34,7 +34,7 @@
                 <div class="relative">
                     <input type="password" id="password" class="input-styled pr-10" required placeholder="••••••••">
                     <!-- BOTÓN DE VISUALIZAR/OCULTAR -->
-                    <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-[#E8A613] transition-colors focus:outline-none">
+                    <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-[#E8A613] transition-colors focus:outline-none" title="Mostrar/Ocultar contraseña">
                         <!-- Icono Ojo (Mostrar) -->
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" id="eyeIcon">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -82,14 +82,14 @@
             eyeOffIcon.classList.toggle('hidden');
         });
 
-        // Lógica de Login
+        // Lógica de Login Seguro
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const btnSubmit = document.getElementById('btnSubmit');
             const errorMessage = document.getElementById('errorMessage');
             
-            // UI Feedback
+            // Feedback UI
             btnSubmit.disabled = true;
             btnSubmit.textContent = 'Verificando...';
             errorMessage.classList.add('hidden');
@@ -106,10 +106,10 @@
                 const data = await response.json();
 
                 if (response.ok && data.success) {
-                    // Éxito
+                    // Éxito: La cookie HttpOnly se establece automáticamente por la API
                     window.location.href = 'portal.html';
                 } else {
-                    // Error
+                    // Error: Contraseña incorrecta
                     throw new Error(data.message || 'Error de autenticación');
                 }
 
