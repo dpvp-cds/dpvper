@@ -1,3 +1,85 @@
+Skip to content
+dpvp-cds
+dpvper
+Repository navigation
+Code
+Issues
+Pull requests
+Actions
+Projects
+Wiki
+Security
+Insights
+Settings
+Files
+Go to file
+t
+api
+BaseTeorica_PI.pdf
+README.md
+favicon.ico
+index.html
+logoprincipal.png
+package.json
+portal.html
+rdpvper.html
+reporte-personal.html
+terapeuta-login.html
+dpvper
+/
+reporte-personal.html
+in
+main
+
+Edit
+
+Preview
+Indent mode
+
+Spaces
+Indent size
+
+4
+Line wrap mode
+
+No wrap
+Editing reporte-personal.html file contents
+  1
+  2
+  3
+  4
+  5
+  6
+  7
+  8
+  9
+ 10
+ 11
+ 12
+ 13
+ 14
+ 15
+ 16
+ 17
+ 18
+ 19
+ 20
+ 21
+ 22
+ 23
+ 24
+ 25
+ 26
+ 27
+ 28
+ 29
+ 30
+ 31
+ 32
+ 33
+ 34
+ 35
+ 36
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -34,254 +116,4 @@
             <div class="container mx-auto px-6 flex justify-between items-center">
                 <a href="portal.html" class="text-sm text-[#E8A613] hover:underline font-bold flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                    Volver al Portal
-                </a>
-                <h1 id="headerTitle" class="text-2xl text-center font-bold">Reporte DPvPer</h1>
-                <button onclick="window.print()" class="bg-[#070404] text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-[#E8A613] transition-colors">
-                    Imprimir Informe
-                </button>
-            </div>
-        </header>
-
-        <main class="container mx-auto px-6 py-12">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Columna de Datos Demográficos -->
-                <div class="lg:col-span-1">
-                    <div class="card">
-                        <h2 class="text-2xl mb-6 border-b pb-3 text-[#E8A613]">Datos del Consultante</h2>
-                        <div id="demographics-content"></div>
-                    </div>
-                </div>
-
-                <!-- Columna de Resultados -->
-                <div class="lg:col-span-2 space-y-8">
-                    <div class="card">
-                        <h2 class="text-2xl mb-6 text-center">Perfil Arquetípico Completo</h2>
-                        <div class="chart-container" style="height: 400px; max-width: 500px; margin: auto;">
-                            <canvas id="radarChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h2 class="text-2xl mb-6">Arquetipos Dominantes</h2>
-                        <div id="dominant-archetypes" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-                    </div>
-                    
-                    <div class="card border-l-8 border-[#E8A613]">
-                        <h2 class="text-2xl mb-6">Sugerencias de Propósito (Fórmula de Síntesis)</h2>
-                        <div id="purpose-suggestions" class="space-y-4"></div>
-                    </div>
-                    
-                    <div class="card bg-red-50/50">
-                        <h2 class="text-2xl mb-6 text-red-800">Análisis de Bloqueos (Preguntas 5 y 6)</h2>
-                        <div id="blockers-content" class="space-y-4"></div>
-                    </div>
-
-                     <div class="card">
-                        <h2 class="text-2xl mb-6">Bitácora de Respuestas</h2>
-                        <div id="all-answers" class="text-sm space-y-4 divide-y divide-gray-100"></div>
-                    </div>
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <script>
-        // DATOS EXACTOS DEL REPORTE VIEJO
-        const arquetiposInfo = {
-            a: { nombre: 'Analista / Sabio', descripcion: 'Impulsado por la lógica, el conocimiento y la estructura.', verbo: 'Organizar', contexto: 'en sistemas y procesos', impacto: 'para generar claridad' },
-            b: { nombre: 'Creador / Innovador', descripcion: 'Motivado por la originalidad, la expresión y la imaginación.', verbo: 'Crear', contexto: 'para audiencias y la cultura', impacto: 'para inspirar nuevas perspectivas' },
-            c: { nombre: 'Conector / Humanista', descripcion: 'Encuentra sentido en la empatía, la comunidad y las relaciones.', verbo: 'Conectar', contexto: 'en comunidades y equipos', impacto: 'para fomentar la pertenencia' },
-            d: { nombre: 'Explorador', descripcion: 'Guiado por la libertad, la curiosidad y las nuevas experiencias.', verbo: 'Descubrir', contexto: 'el conocimiento y el mundo', impacto: 'para expandir la comprensión' },
-            e: { nombre: 'Constructor / Contribuidor', descripcion: 'Impulsado por el servicio, el impacto tangible y el legado.', verbo: 'Construir', contexto: 'para la sociedad y una causa', impacto: 'para generar un impacto tangible' },
-            f: { nombre: 'Sanador / Espiritual', descripcion: 'Busca la armonía, la paz interior y la trascendencia.', verbo: 'Sanar', contexto: 'al individuo y al alma', impacto: 'para cultivar el bienestar' }
-        };
-
-        const preguntasTexto = {
-            q1: "1. Cuándo te sientes absorto y lleno de energía...",
-            q2: "2. Tu valor 'no negociable' fundamental...",
-            q3: "3. El logro que haría que todo valiera la pena...",
-            q4: "4. Tu principal impulso sin miedo ni limitaciones...",
-            q5: "5. La principal fuente de tu incoherencia...",
-            q6: "6. La creencia limitante que más resuena...",
-            q7: "7. El verbo que mejor describe tu propósito...",
-            q8: "8. Tu forma natural de abordar un nuevo proyecto...",
-            q9: "9. Tu primera reacción frente a un obstáculo...",
-            q10: "10. La lección más importante de tus 'fracasos'...",
-            q11: "11. La actividad que más te 'recarga las baterías'...",
-            q12: "12. Cómo te gustaría impactar positivamente..."
-        };
-
-        const opcionesTexto = {
-             q1: {a:"a) Resolviendo un problema...", b:"b) Creando algo nuevo...", c:"c) Conectando con personas...", d:"d) Organizando, planificando...", e:"e) En movimiento, explorando...", f:"f) En un espacio de calma..."},
-             q2: {d:"a) Libertad...", f:"b) Seguridad...", b:"c) Crecimiento...", c:"d) Conexión...", a:"e) Integridad...", e:"f) Impacto..."},
-             q3: {c:"a) Haber construido relaciones...", a:"b) Haber alcanzado la maestría...", e:"c) Haber creado una empresa...", d:"d) Haber vivido una vida de aventuras...", e:"e) Haber ayudado a muchas personas...", f:"f) Haber alcanzado un profundo estado de paz..."},
-             q4: {b:"a) Crear...", d:"b) Explorar...", e:"c) Ayudar...", a:"d) Aprender...", e:"e) Construir...", f:"f) Sanar..."},
-             q5: {c:"a) Las expectativas de mi familia...", c:"b) La presión social...", b:"c) Mi propio perfeccionismo...", na:"d) La procrastinación...", na:"e) El cansancio...", f:"f) La duda sobre si soy capaz..."},
-             q6: {na:"a) 'No tengo suficiente dinero...'", na:"b) 'Ya es debajo demasiado tarde...'", a:"c) 'Necesito saberlo todo...'", b:"d) 'Fracasar sería terrible...'", na:"e) 'Hay otros que son mejores...'", c:"f) 'Priorizar mis sueños es egoísta...'"},
-             q7: {b:"a) Inspirar", b:"b) Crear", f:"c) Sanar", a:"d) Organizar", c:"e) Conectar", d:"f) Descubrir"},
-             q8: {a:"a) Planificar meticulosamente...", d:"b) Lanzarme a la acción...", c:"c) Buscar a otras personas...", a:"d) Investigar y aprender...", b:"e) Empezar con un prototipo...", f:"f) Reflexionar internamente..."},
-             q9: {a:"a) Analizar la situación...", b:"b) Buscar una ruta creativa...", c:"c) Pedir consejo...", f:"d) Detenerme a reflexionar...", e:"e) Sentir la frustración...", d:"f) Dar un paso atrás..."},
-             q10: {f:"a) El descubrimiento de una fortaleza...", b:"b) La importancia de la flexibilidad...", c:"c) Quiénes son las personas...", d:"d) Una mayor claridad...", e:"e) Que soy mucho más resiliente...", a:"f) Una habilidad o conocimiento práctico..."},
-             q11: {f:"a) La calma y el silencio...", c:"b) La conexión social...", b:"c) La expresión creativa...", d:"d) El movimiento físico...", a:"e) La estimulación intelectual...", e:"f) El servicio..."},
-             q12: {d:"a) Sirviendo como un ejemplo...", e:"b) Creando oportunidades...", c:"c) Generando un ambiente de alegría...", a:"d) Compartiendo mi conocimiento...", b:"e) Dejando una obra...", f:"f) Aliviando el sufrimiento..."}
-        };
-
-        document.addEventListener('DOMContentLoaded', fetchReporteIndividual);
-
-        async function fetchReporteIndividual() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const id = urlParams.get('id');
-            const coleccion = urlParams.get('coleccion') || 'reportes-personales';
-
-            if (!id) {
-                document.getElementById('loading').innerHTML = '<p class="text-red-500 font-bold">Error: No se encontró el ID del reporte.</p>';
-                return;
-            }
-
-            try {
-                // LLAMADA A LA API SEGURA
-                const response = await fetch(`/api/get-reporte-individual?id=${id}&coleccion=${coleccion}`);
-                
-                if (response.status === 401) {
-                    window.location.href = 'terapeuta-login.html';
-                    return;
-                }
-
-                if (!response.ok) throw new Error('No se pudo cargar el reporte.');
-                
-                const reporte = await response.json();
-                renderReporte(reporte);
-
-            } catch (error) {
-                console.error(error);
-                document.getElementById('loading').innerHTML = '<p class="text-red-500">Error al cargar el expediente. Por favor, verifique su conexión.</p>';
-            }
-        }
-
-        function renderReporte(reporte) {
-            const demo = reporte.demograficos;
-            const res = reporte.respuestas;
-
-            document.getElementById('headerTitle').textContent = `Expediente de ${demo.nombre.split(' ')[0]}`;
-            
-            // 1. Render Demographics (Usando tus etiquetas exactas)
-            const demoDiv = document.getElementById('demographics-content');
-            const demoLabels = { 
-                nombre: 'Nombre Completo', 
-                email: 'Correo Electrónico', 
-                edad: 'Edad', 
-                profesion: 'Profesión / Ocupación',
-                pais: 'País', 
-                nivel_educativo: 'Nivel Educativo', 
-                situacion_laboral: 'Situación Laboral', 
-                situacion_sentimental: 'Situación Sentimental', 
-                hijos: 'Número de Hijos', 
-                mascotas: 'Mascotas'
-            };
-            
-            let demoHtml = '';
-            Object.entries(demoLabels).forEach(([key, label]) => {
-                demoHtml += `<div class="demographic-item"><p class="text-xs text-gray-400 uppercase font-bold mb-1">${label}</p><span>${demo[key] || '---'}</span></div>`;
-            });
-            demoDiv.innerHTML = demoHtml;
-
-            // 2. Calcular scores (Lógica exacta del reporte viejo)
-            const scores = { a: 0, b: 0, c: 0, d: 0, e: 0, f: 0 };
-            for (const pregunta in res) {
-                const arquetipoVotado = res[pregunta];
-                if (scores.hasOwnProperty(arquetipoVotado)) {
-                    scores[arquetipoVotado]++;
-                }
-            }
-            const sortedScores = Object.entries(scores).sort(([,a],[,b]) => b-a);
-            const [primario, secundario, terciario] = sortedScores;
-
-            // 3. Render Radar Chart
-            const ctx = document.getElementById('radarChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: Object.values(arquetiposInfo).map(a => a.nombre.split(' / ')[0]),
-                    datasets: [{
-                        label: 'Intensidad Arquetípica',
-                        data: Object.keys(arquetiposInfo).map(key => scores[key]),
-                        backgroundColor: 'rgba(232, 166, 19, 0.4)',
-                        borderColor: '#E8A613',
-                        borderWidth: 3,
-                        pointBackgroundColor: '#070404',
-                        pointBorderColor: '#fff',
-                        pointRadius: 4
-                    }]
-                },
-                options: { 
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { r: { suggestedMin: 0, suggestedMax: 6, ticks: { display: false, stepSize: 1 } } },
-                    plugins: { legend: { display: false } }
-                }
-            });
-
-            // 4. Render Dominant Archetypes
-            const dominantDiv = document.getElementById('dominant-archetypes');
-            const triada = [
-                { rank: '1. Primario', data: primario, color: 'border-[#E8A613] bg-yellow-50' },
-                { rank: '2. Secundario', data: secundario, color: 'border-gray-400 bg-gray-50' },
-                { rank: '3. Terciario', data: terciario, color: 'border-gray-300 bg-gray-50' }
-            ];
-
-            dominantDiv.innerHTML = triada.map(item => `
-                <div class="p-4 border-l-4 ${item.color} rounded-r-lg shadow-sm">
-                    <h4 class="font-bold text-sm text-gray-500 uppercase mb-1">${item.rank}</h4>
-                    <p class="font-bold text-lg text-[#070404]">${arquetiposInfo[item.data[0]].nombre} (${item.data[1]} pts)</p>
-                    <p class="text-xs text-gray-600 mt-2 leading-relaxed">${arquetiposInfo[item.data[0]].descripcion}</p>
-                </div>
-            `).join('');
-
-            // 5. Render Purpose Suggestions
-            const suggestionsDiv = document.getElementById('purpose-suggestions');
-            const p = arquetiposInfo[primario[0]];
-            const s = arquetiposInfo[secundario[0]];
-            const t = arquetiposInfo[terciario[0]];
-            suggestionsDiv.innerHTML = `
-                <div class="p-4 bg-gray-100 rounded-xl italic font-medium">1. "${p.verbo} ${s.contexto} para ${t.impacto}."</div>
-                <div class="p-4 bg-gray-100 rounded-xl italic font-medium">2. "${p.verbo} ${t.contexto} para ${s.impacto}."</div>
-            `;
-
-            // 6. Render Blockers
-            const blockersDiv = document.getElementById('blockers-content');
-            blockersDiv.innerHTML = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="p-4 bg-white border border-red-100 rounded-lg">
-                        <p class="text-xs font-bold text-red-400 uppercase mb-1">Incoherencia Principal</p>
-                        <p class="text-sm font-semibold">${opcionesTexto.q5[res.q5] || 'No registrada'}</p>
-                    </div>
-                    <div class="p-4 bg-white border border-red-100 rounded-lg">
-                        <p class="text-xs font-bold text-red-400 uppercase mb-1">Creencia Limitante</p>
-                        <p class="text-sm font-semibold">${opcionesTexto.q6[res.q6] || 'No registrada'}</p>
-                    </div>
-                </div>
-            `;
-            
-            // 7. Render all answers (Bitácora)
-            const answersDiv = document.getElementById('all-answers');
-            let answersHtml = '';
-            for(let i=1; i<=12; i++){
-                const qKey = `q${i}`;
-                const val = res[qKey];
-                const textoFinal = opcionesTexto[qKey][val] || "Respuesta no registrada.";
-                answersHtml += `
-                    <div class="py-2">
-                        <p class="text-[10px] font-bold text-[#E8A613] uppercase tracking-widest">${preguntasTexto[qKey]}</p>
-                        <p class="text-sm text-gray-800 mt-1">${textoFinal}</p>
-                    </div>
-                `;
-            }
-            answersDiv.innerHTML = answersHtml;
-
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('hidden');
-        }
-    </script>
-</body>
-</html>
+Use Control + Shift + m to toggle the tab key moving focus. Alternatively, use esc then tab to move to the next interactive element on the page.
