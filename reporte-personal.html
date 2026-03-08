@@ -1,1 +1,291 @@
-d
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Reporte - DPvPer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; background-color: #F8F7F2; color: #6B6661; }
+        h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: #070404; }
+        .card { background-color: white; border-radius: 16px; padding: 2rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .demographic-item { border-bottom: 1px solid #e5e7eb; padding-bottom: 0.75rem; margin-bottom: 0.75rem; }
+        .demographic-item span { font-weight: 600; color: #070404; }
+        
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: white; }
+            .card { box-shadow: none; border: 1px solid #eee; margin-bottom: 1rem; }
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #E8A613;
+            width: 40px; height: 40px; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <!-- ESTADO DE CARGA -->
+    <div id="loading" class="flex items-center justify-center h-screen">
+        <div class="text-center">
+            <div class="loader mx-auto mb-4"></div>
+            <p class="text-xl font-medium">Cargando expediente clínico...</p>
+        </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div id="mainContent" class="hidden">
+        <header class="bg-white py-4 shadow-sm no-print">
+            <div class="container mx-auto px-6 flex justify-between items-center">
+                <a href="portal.html" class="text-sm text-[#E8A613] hover:underline font-bold flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                    Volver al Portal
+                </a>
+                <h1 id="headerTitle" class="text-2xl font-bold">Reporte DPvPer</h1>
+                <button onclick="window.print()" class="bg-[#070404] text-white px-4 py-2 rounded-full text-xs font-bold hover:bg-[#E8A613] transition-colors">
+                    Imprimir Informe
+                </button>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-6 py-12">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- COLUMNA IZQUIERDA: DATOS -->
+                <div class="lg:col-span-1">
+                    <div class="card h-full">
+                        <h2 class="text-2xl mb-6 border-b pb-3 text-[#E8A613]">Datos del Consultante</h2>
+                        <div id="demographics-content">
+                            <!-- Inyectado por JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- COLUMNA DERECHA: RESULTADOS -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Gráfico Radar -->
+                    <div class="card">
+                        <h2 class="text-2xl mb-6 text-center font-bold">Perfil Arquetípico Completo</h2>
+                        <div class="chart-container" style="height: 400px; max-width: 500px; margin: auto;">
+                            <canvas id="radarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Arquetipos Dominantes (La Tríada) -->
+                    <div class="card">
+                        <h2 class="text-2xl mb-6 font-bold">Arquetipos Dominantes</h2>
+                        <div id="dominant-archetypes" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- Inyectado por JS -->
+                        </div>
+                    </div>
+                    
+                    <!-- Fórmulas de Síntesis -->
+                    <div class="card border-l-8 border-[#E8A613]">
+                        <h2 class="text-2xl mb-6 font-bold">Sugerencias de Propósito (Fórmula de Síntesis)</h2>
+                        <div id="purpose-suggestions" class="space-y-4 text-sm italic font-medium">
+                            <!-- Inyectado por JS -->
+                        </div>
+                    </div>
+                    
+                    <!-- Análisis de Bloqueos -->
+                    <div class="card bg-red-50/30">
+                        <h2 class="text-2xl mb-6 text-red-800 font-bold">Análisis de Bloqueos (Preguntas 5 y 6)</h2>
+                        <div id="blockers-content" class="space-y-4">
+                            <!-- Inyectado por JS -->
+                        </div>
+                    </div>
+
+                     <!-- Bitácora Completa -->
+                     <div class="card">
+                        <h2 class="text-2xl mb-6 font-bold">Respuestas Detalladas</h2>
+                        <div id="all-answers" class="text-sm space-y-4 divide-y divide-gray-100">
+                            <!-- Inyectado por JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // DICCIONARIOS EXACTOS DEL REPORTE ORIGINAL
+        const arquetiposInfo = {
+            a: { nombre: 'Analista / Sabio', descripcion: 'Impulsado por la lógica, el conocimiento y la estructura.', verbo: 'Organizar', contexto: 'en sistemas y procesos', impacto: 'para generar claridad' },
+            b: { nombre: 'Creador / Innovador', descripcion: 'Motivado por la originalidad, la expresión y la imaginación.', verbo: 'Crear', contexto: 'para audiencias y la cultura', impacto: 'para inspirar nuevas perspectivas' },
+            c: { nombre: 'Conector / Humanista', descripcion: 'Encuentra sentido en la empatía, la comunidad y las relaciones.', verbo: 'Conectar', contexto: 'en comunidades y equipos', impacto: 'para fomentar la pertenencia' },
+            d: { nombre: 'Explorador', descripcion: 'Guiado por la libertad, la curiosidad y las nuevas experiencias.', verbo: 'Descubrir', contexto: 'el conocimiento y el mundo', impacto: 'para expandir la comprensión' },
+            e: { nombre: 'Constructor / Contribuidor', descripcion: 'Impulsado por el servicio, el impacto tangible y el legado.', verbo: 'Construir', contexto: 'para la sociedad y una causa', impacto: 'para generar un impacto tangible' },
+            f: { nombre: 'Sanador / Espiritual', descripcion: 'Busca la armonía, la paz interior y la trascendencia.', verbo: 'Sanar', contexto: 'al individuo y al alma', impacto: 'para cultivar el bienestar' }
+        };
+
+        const preguntasTexto = {
+            q1: "1. Cuándo te sientes absorto y lleno de energía...",
+            q2: "2. Tu valor 'no negociable' fundamental...",
+            q3: "3. El logro que haría que todo valiera la pena...",
+            q4: "4. Tu principal impulso sin miedo ni limitaciones...",
+            q5: "5. La principal fuente de tu incoherencia...",
+            q6: "6. La creencia limitante que más resuena...",
+            q7: "7. El verbo que mejor describe tu propósito...",
+            q8: "8. Tu forma natural de abordar un nuevo proyecto...",
+            q9: "9. Tu primera reacción frente a un obstáculo...",
+            q10: "10. La lección más importante de tus 'fracasos'...",
+            q11: "11. La actividad que más te 'recarga las baterías'...",
+            q12: "12. Cómo te gustaría impactar positivamente..."
+        };
+
+        const opcionesTexto = {
+             q1: {a:"a) Resolviendo un problema...", b:"b) Creando algo nuevo...", c:"c) Conectando con personas...", d:"d) Organizando, planificando...", e:"e) En movimiento, explorando...", f:"f) En un espacio de calma..."},
+             q2: {d:"a) Libertad...", f:"b) Seguridad...", b:"c) Crecimiento...", c:"d) Conexión...", a:"e) Integridad...", e:"f) Impacto..."},
+             q3: {c:"a) Haber construido relaciones...", a:"b) Haber alcanzado la maestría...", e:"c) Haber creado una empresa...", d:"d) Haber vivido una vida de aventuras...", e:"e) Haber ayudado a muchas personas...", f:"f) Haber alcanzado un profundo estado de paz..."},
+             q4: {b:"a) Crear...", d:"b) Explorar...", e:"c) Ayudar...", a:"d) Aprender...", e:"e) Construir...", f:"f) Sanar..."},
+             q5: {c:"a) Las expectativas de mi familia...", c:"b) La presión social...", b:"c) Mi propio perfeccionismo...", na:"d) La procrastinación...", na:"e) El cansancio...", f:"f) La duda sobre si soy capaz..."},
+             q6: {na:"a) 'No tengo suficiente dinero...'", na:"b) 'Ya es debajo demasiado tarde...'", a:"c) 'Necesito saberlo todo...'", b:"d) 'Fracasar sería terrible...'", na:"e) 'Hay otros que son mejores...'", c:"f) 'Priorizar mis sueños es egoísmo...'"},
+             q7: {b:"a) Inspirar", b:"b) Crear", f:"c) Sanar", a:"d) Organizar", c:"e) Conectar", d:"f) Descubrir"},
+             q8: {a:"a) Planificar meticulosamente...", d:"b) Lanzarme a la acción...", c:"c) Buscar a otras personas...", a:"d) Investigar y aprender...", b:"e) Empezar con un prototipo...", f:"f) Reflexionar internamente..."},
+             q9: {a:"a) Analizar la situación...", b:"b) Buscar una ruta creativa...", c:"c) Pedir consejo...", f:"d) Detenerme a reflexionar...", e:"e) Sentir la frustración...", d:"f) Dar un paso atrás..."},
+             q10: {f:"a) El descubrimiento de una fortaleza...", b:"b) La importancia de la flexibilidad...", c:"c) Quiénes son las personas...", d:"d) Una mayor claridad...", e:"e) Que soy mucho más resiliente...", a:"f) Una habilidad o conocimiento práctico..."},
+             q11: {f:"a) La calma y el silencio...", c:"b) La conexión social...", b:"c) La expresión creativa...", d:"d) El movimiento físico...", a:"e) La estimulación intelectual...", e:"f) El servicio..."},
+             q12: {d:"a) Sirviendo como un ejemplo...", e:"b) Creando oportunidades...", c:"c) Generando un ambiente de alegría...", a:"d) Compartiendo mi conocimiento...", b:"e) Dejando una obra...", f:"f) Aliviando el sufrimiento..."}
+        };
+
+        document.addEventListener('DOMContentLoaded', fetchReporte);
+
+        async function fetchReporte() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const id = urlParams.get('id');
+            const coleccion = urlParams.get('coleccion') || 'reportes-personales';
+
+            if (!id) {
+                document.getElementById('loading').innerHTML = '<p class="text-red-500 font-bold">Error: ID de reporte no encontrado.</p>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/get-reporte-individual?id=${id}&coleccion=${coleccion}`);
+                if (response.status === 401) {
+                    window.location.href = 'terapeuta-login.html';
+                    return;
+                }
+                if (!response.ok) throw new Error('Error de conexión');
+
+                const reporte = await response.json();
+                renderReporte(reporte);
+
+            } catch (error) {
+                console.error(error);
+                document.getElementById('loading').innerHTML = '<p class="text-red-500">Error al cargar el expediente.</p>';
+            }
+        }
+
+        function renderReporte(reporte) {
+            const demo = reporte.demograficos;
+            const res = reporte.respuestas;
+
+            document.getElementById('headerTitle').textContent = `Reporte de ${demo.nombre.split(' ')[0]}`;
+
+            // 1. Render Demographics
+            const demoDiv = document.getElementById('demographics-content');
+            const labels = {
+                nombre: 'Nombre Completo', email: 'Email', edad: 'Edad', profesion: 'Profesión / Ocupación',
+                pais: 'País', nivel_educativo: 'Nivel Educativo', situacion_laboral: 'Situación Laboral',
+                situacion_sentimental: 'Situación Sentimental', hijos: 'Hijos', mascotas: 'Mascotas'
+            };
+            demoDiv.innerHTML = Object.entries(labels).map(([key, label]) => `
+                <div class="demographic-item"><p class="text-xs text-gray-400 uppercase font-bold mb-1">${label}</p><span>${demo[key] || '---'}</span></div>
+            `).join('');
+
+            // 2. Cálculo de Puntajes (Mapeo de tu sistema original)
+            const scores = { a: 0, b: 0, c: 0, d: 0, e: 0, f: 0 };
+            for (const q in res) {
+                const choice = res[q]; // ej: 'a', 'b'...
+                // Buscamos en opcionesTexto[q] qué arquetipo (key) tiene esa opción elegida
+                const arqKey = Object.keys(opcionesTexto[q]).find(k => opcionesTexto[q][k].startsWith(choice));
+                if (arqKey && scores.hasOwnProperty(arqKey)) {
+                    scores[arqKey]++;
+                }
+            }
+
+            const sortedScores = Object.entries(scores).sort(([,a],[,b]) => b-a);
+            const [p1, p2, p3] = sortedScores;
+
+            // 3. Radar Chart
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: Object.values(arquetiposInfo).map(a => a.nombre.split(' / ')[0]),
+                    datasets: [{
+                        label: 'Puntuación',
+                        data: Object.keys(arquetiposInfo).map(key => scores[key]),
+                        backgroundColor: 'rgba(232, 166, 19, 0.2)',
+                        borderColor: '#E8A613',
+                        pointBackgroundColor: '#E8A613',
+                        borderWidth: 2
+                    }]
+                },
+                options: { 
+                    scales: { r: { suggestedMin: 0, suggestedMax: 6, ticks: { stepSize: 1, display: false } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // 4. Tríada de Poder
+            const dominantDiv = document.getElementById('dominant-archetypes');
+            const triad = [
+                { rank: '1. Primario', data: p1, color: 'border-[#E8A613] bg-yellow-50' },
+                { rank: '2. Secundario', data: p2, color: 'border-gray-400 bg-gray-50' },
+                { rank: '3. Terciario', data: p3, color: 'border-gray-300 bg-gray-50' }
+            ];
+            dominantDiv.innerHTML = triad.map(t => `
+                <div class="p-4 border-l-4 ${t.color} rounded-r-lg shadow-sm">
+                    <h4 class="font-bold text-xs text-gray-400 uppercase mb-1">${t.rank}</h4>
+                    <p class="font-bold text-base text-[#070404]">${arquetiposInfo[t.data[0]].nombre} (${t.data[1]} pts)</p>
+                    <p class="text-[10px] text-gray-500 mt-2 leading-relaxed">${arquetiposInfo[t.data[0]].descripcion}</p>
+                </div>
+            `).join('');
+
+            // 5. Sugerencias de Propósito
+            const suggestionsDiv = document.getElementById('purpose-suggestions');
+            const ar1 = arquetiposInfo[p1[0]], ar2 = arquetiposInfo[p2[0]], ar3 = arquetiposInfo[p3[0]];
+            suggestionsDiv.innerHTML = `
+                <p class="p-3 bg-gray-50 rounded-md">1. "${ar1.verbo} ${ar2.contexto} para ${ar3.impacto}."</p>
+                <p class="p-3 bg-gray-50 rounded-md">2. "${ar1.verbo} ${ar3.contexto} para ${ar2.impacto}."</p>
+            `;
+
+            // 6. Bloqueos (Q5 y Q6)
+            const blockersDiv = document.getElementById('blockers-content');
+            blockersDiv.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 bg-white border border-red-100 rounded-lg">
+                        <p class="text-[10px] font-bold text-red-400 uppercase mb-1">Incoherencia principal</p>
+                        <p class="text-sm font-semibold">${opcionesTexto.q5[res.q5] || 'No registrada'}</p>
+                    </div>
+                    <div class="p-4 bg-white border border-red-100 rounded-lg">
+                        <p class="text-[10px] font-bold text-red-400 uppercase mb-1">Creencia limitante</p>
+                        <p class="text-sm font-semibold">${opcionesTexto.q6[res.q6] || 'No registrada'}</p>
+                    </div>
+                </div>
+            `;
+
+            // 7. Bitácora de Respuestas
+            const answersDiv = document.getElementById('all-answers');
+            let answersHtml = '';
+            for(let i=1; i<=12; i++){
+                const qKey = `q${i}`;
+                answersHtml += `
+                    <div class="py-3">
+                        <p class="text-[10px] font-bold text-[#E8A613] uppercase tracking-widest mb-1">${preguntasTexto[qKey]}</p>
+                        <p class="text-sm text-gray-800">${opcionesTexto[qKey][res[qKey]] || 'Respuesta no registrada'}</p>
+                    </div>
+                `;
+            }
+            answersDiv.innerHTML = answersHtml;
+
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
