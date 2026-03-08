@@ -3,126 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Informe Clínico - DPvPer</title>
+    <title>Informe Clínico DPvPer - Caminos del Ser</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     
     <style>
         body { font-family: 'Poppins', sans-serif; background-color: #F8F7F2; color: #6B6661; }
-        h1, h2, h3 { font-family: 'Playfair Display', serif; color: #070404; }
-        .card { background-color: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
-        .label { font-size: 0.75rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 0.25rem; }
-        .value { font-size: 1rem; color: #070404; font-weight: 500; }
-        .btn-back { color: #6B6661; display: flex; align-items: center; gap: 0.5rem; transition: color 0.2s; }
-        .btn-back:hover { color: #E8A613; }
+        h1, h2, h3, h4 { font-family: 'Playfair Display', serif; color: #070404; }
+        .card { background-color: white; border-radius: 16px; padding: 2rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); border: 1px solid #f0f0f0; }
+        .label-admin { font-size: 0.7rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 800; margin-bottom: 0.15rem; }
+        .value-admin { font-size: 0.95rem; color: #070404; font-weight: 500; border-bottom: 1px solid #f3f4f6; padding-bottom: 0.4rem; margin-bottom: 0.8rem; }
+        .btn-back { color: #6B6661; display: flex; align-items: center; gap: 0.5rem; transition: all 0.2s; font-weight: 600; }
+        .btn-back:hover { color: #E8A613; transform: translateX(-3px); }
+        
+        .loader {
+            border: 4px solid #f3f3f3; border-radius: 50%; border-top: 4px solid #E8A613;
+            width: 40px; height: 40px; animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        @media print {
+            .no-print { display: none !important; }
+            body { background-color: white; }
+            .card { box-shadow: none; border: 1px solid #eee; }
+        }
     </style>
 </head>
-<body>
+<body class="leading-relaxed">
     
-    <!-- HEADER ADMIN -->
-    <header class="bg-white py-4 shadow-sm sticky top-0 z-50 print:hidden">
+    <!-- HEADER PROFESIONAL -->
+    <header class="bg-white py-4 shadow-sm sticky top-0 z-50 no-print">
         <div class="container mx-auto px-6 flex justify-between items-center">
             <div class="flex items-center gap-4">
                 <img src="logoprincipal.png" alt="Logo DPvPer" class="h-10 object-contain">
-                <span class="bg-[#070404] text-white text-[10px] px-2 py-1 rounded uppercase tracking-widest font-bold">Vista Profesional</span>
+                <span class="bg-[#070404] text-white text-[10px] px-2 py-1 rounded uppercase tracking-widest font-bold">Expediente Clínico</span>
             </div>
             <div class="flex items-center gap-4">
-                <button onclick="window.print()" class="text-sm font-bold text-[#E8A613] hover:text-[#d4940f] flex items-center gap-2">
+                <button onclick="window.print()" class="bg-[#E8A613] text-white text-xs font-bold px-4 py-2 rounded-full hover:bg-[#d4940f] transition flex items-center gap-2 shadow-md">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" /></svg>
-                    Imprimir
+                    Imprimir Informe
                 </button>
             </div>
         </div>
     </header>
 
     <main class="container mx-auto px-6 py-8 max-w-6xl">
-        <!-- Navegación -->
-        <div class="mb-8 print:hidden">
-            <a href="portal.html" class="btn-back">
+        <!-- Navegación y Título -->
+        <div class="mb-8 no-print flex justify-between items-center">
+            <a href="portal.html" class="btn-back text-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                Volver al Portal
+                Volver al Listado de Pacientes
             </a>
+            <span id="badgeColeccion" class="text-[10px] font-bold bg-gray-100 text-gray-400 px-3 py-1 rounded-full uppercase">...</span>
         </div>
 
-        <div id="loading" class="text-center py-20">
-            <div class="animate-spin h-10 w-10 border-4 border-[#E8A613] rounded-full border-t-transparent mx-auto mb-4"></div>
-            <p class="text-gray-400">Cargando expediente...</p>
+        <!-- Cargando -->
+        <div id="loading-state" class="text-center py-20">
+            <div class="loader mx-auto mb-4"></div>
+            <p class="text-gray-400 font-medium">Accediendo a la Bóveda Segura...</p>
         </div>
 
-        <div id="report-content" class="hidden">
-            <!-- Encabezado del Reporte -->
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 border-b border-gray-200 pb-6">
+        <!-- Contenido del Reporte -->
+        <div id="report-content" class="hidden animate-fade-in">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 border-b border-gray-200 pb-8">
                 <div>
-                    <h1 class="text-4xl font-bold text-[#070404] mb-2" id="nombrePaciente">...</h1>
-                    <p class="text-gray-500">Informe de Propósito de Vida Personal</p>
+                    <h1 class="text-4xl md:text-5xl font-bold text-[#070404] mb-2" id="nombrePaciente">...</h1>
+                    <p class="text-gray-500 font-medium">Diagnóstico de Propósito de Vida Personal (DPvPer)</p>
                 </div>
-                <div class="text-right mt-4 md:mt-0">
-                    <p class="label">Fecha de Evaluación</p>
-                    <p class="value" id="fechaReporte">...</p>
+                <div class="text-right mt-6 md:mt-0 bg-[#F8F7F2] p-4 rounded-xl border border-gray-100">
+                    <p class="label-admin">Fecha de Evaluación</p>
+                    <p class="value-admin !border-none !mb-0" id="fechaReporte">...</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
-                <!-- Columna Izquierda: Datos Demográficos -->
+                <!-- COLUMNA 1: DEMOGRÁFICOS -->
                 <div class="lg:col-span-1 space-y-6">
                     <div class="card">
-                        <h3 class="text-lg font-bold mb-6 text-[#E8A613] border-b pb-2">Perfil Demográfico</h3>
+                        <h3 class="text-xl font-bold mb-6 text-[#E8A613] flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                            Perfil del Consultante
+                        </h3>
                         
-                        <div class="space-y-4">
-                            <div>
-                                <p class="label">Edad</p>
-                                <p class="value" id="edad">...</p>
-                            </div>
-                            <div>
-                                <p class="label">Ocupación</p>
-                                <p class="value" id="profesion">...</p>
-                            </div>
-                            <div>
-                                <p class="label">País</p>
-                                <p class="value" id="pais">...</p>
-                            </div>
-                            <div>
-                                <p class="label">Nivel Educativo</p>
-                                <p class="value" id="educacion">...</p>
-                            </div>
-                            <div>
-                                <p class="label">Estado Civil</p>
-                                <p class="value" id="estadoCivil">...</p>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4 pt-2">
-                                <div>
-                                    <p class="label">Hijos</p>
-                                    <p class="value" id="hijos">...</p>
-                                </div>
-                                <div>
-                                    <p class="label">Mascotas</p>
-                                    <p class="value" id="mascotas">...</p>
-                                </div>
-                            </div>
+                        <div id="demographics-grid">
+                            <!-- Inyectado por JS -->
                         </div>
                     </div>
 
-                    <div class="card bg-[#070404] text-white">
+                    <div class="card bg-[#070404] text-white border-none shadow-xl">
                         <p class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Arquetipo Dominante</p>
-                        <h2 class="text-2xl font-serif text-[#E8A613]" id="arquetipo">...</h2>
+                        <h2 class="text-3xl font-serif text-[#E8A613]" id="arquetipoDominante">...</h2>
+                        <p class="mt-4 text-sm text-gray-400 leading-relaxed italic" id="arquetipoDesc">...</p>
                     </div>
                 </div>
 
-                <!-- Columna Derecha: Gráfico -->
-                <div class="lg:col-span-2">
-                    <div class="card h-full">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-xl font-bold">Mapa de Impulsores</h3>
-                            <span class="text-xs bg-[#F8F7F2] px-3 py-1 rounded-full text-gray-600 font-bold">DPvPer Scale</span>
+                <!-- COLUMNA 2-3: RESULTADOS Y GRÁFICO -->
+                <div class="lg:col-span-2 space-y-8">
+                    <div class="card">
+                        <div class="flex justify-between items-center mb-8 border-b pb-4">
+                            <h3 class="text-2xl font-bold">Mapa de Impulsores Vitales</h3>
+                            <span class="text-[10px] font-black uppercase tracking-tighter bg-gray-50 px-2 py-1 rounded">Escala 0 - 10</span>
                         </div>
                         <div class="relative w-full" style="height: 400px;">
                             <canvas id="radarChart"></canvas>
                         </div>
-                        <div class="mt-8 pt-6 border-t border-gray-100">
-                            <h4 class="font-bold text-sm text-gray-800 mb-2">Notas del Terapeuta</h4>
-                            <textarea class="w-full bg-[#F8F7F2] rounded-lg p-4 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#E8A613]" rows="4" placeholder="Escriba aquí sus observaciones clínicas..."></textarea>
+                    </div>
+
+                    <!-- ARQUETIPOS TOP 3 -->
+                    <div class="card">
+                        <h3 class="text-2xl font-bold mb-6">Tríada de Poder</h3>
+                        <div id="triada-container" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <!-- Inyectado por JS -->
+                        </div>
+                    </div>
+                    
+                    <!-- SÍNTESIS DE PROPÓSITO -->
+                    <div class="card border-l-8 border-[#E8A613]">
+                        <h3 class="text-2xl font-bold mb-4">Fórmulas de Síntesis (Propósito)</h3>
+                        <p class="text-sm text-gray-500 mb-6">Estructuras sugeridas para la construcción del enunciado de propósito de vida del consultante:</p>
+                        <div id="formulas-container" class="space-y-4">
+                            <!-- Inyectado por JS -->
+                        </div>
+                    </div>
+                    
+                    <!-- BLOQUEOS -->
+                    <div class="card bg-red-50/30 border-red-100">
+                        <h3 class="text-2xl font-bold mb-6 text-red-800">Análisis de Bloqueos</h3>
+                        <div id="blockers-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Inyectado por JS -->
+                        </div>
+                    </div>
+
+                    <!-- RESPUESTAS DETALLADAS -->
+                    <div class="card">
+                        <button onclick="document.getElementById('respuestas-full').classList.toggle('hidden')" class="w-full flex justify-between items-center text-left">
+                            <h3 class="text-2xl font-bold">Bitácora de Respuestas (12)</h3>
+                            <span class="text-[#E8A613] text-sm font-bold">Ver/Ocultar Detalles</span>
+                        </button>
+                        <div id="respuestas-full" class="hidden mt-8 space-y-6 divide-y divide-gray-100">
+                            <!-- Inyectado por JS -->
                         </div>
                     </div>
                 </div>
@@ -131,102 +152,194 @@
         </div>
     </main>
 
+    <footer class="bg-white border-t border-gray-100 py-12 mt-20 no-print text-center">
+        <p class="text-gray-400 text-xs tracking-widest uppercase font-bold">&copy; 2025 Jorge Arango Castaño - Sistema de Gestión Humana DPvPer</p>
+    </footer>
+
     <script>
+        // MAPEO DE INFORMACIÓN (Idéntico a rdpvper.html para consistencia)
+        const ARQUETIPOS_DATA = {
+            a: { nombre: 'Analista / Sabio', desc: 'Impulsado por el conocimiento y la estructura lógica.', verbo: 'Organizar', contexto: 'en sistemas y procesos', impacto: 'para generar claridad' },
+            b: { nombre: 'Creador / Innovador', desc: 'Motivado por la expresión, la imaginación y lo nuevo.', verbo: 'Crear', contexto: 'para audiencias y cultura', impacto: 'para inspirar nuevas perspectivas' },
+            c: { nombre: 'Conector / Humanista', desc: 'Encuentra sentido en la empatía y las relaciones humanas.', verbo: 'Conectar', contexto: 'en comunidades y equipos', impacto: 'para fomentar pertenencia' },
+            d: { nombre: 'Explorador', desc: 'Guiado por la libertad, la curiosidad y el descubrimiento.', verbo: 'Descubrir', contexto: 'el mundo y la verdad', impacto: 'para expandir horizontes' },
+            e: { nombre: 'Constructor / Contribuidor', desc: 'Impulsado por el servicio práctico y el legado tangible.', verbo: 'Construir', contexto: 'para la sociedad y causas', impacto: 'para dejar una huella útil' },
+            f: { nombre: 'Sanador / Espiritual', desc: 'Busca la armonía, la trascendencia y la paz interior.', verbo: 'Sanar', contexto: 'al individuo y al espíritu', impacto: 'para cultivar bienestar' }
+        };
+
+        const PREGUNTAS_TEXTO = {
+            q1: "1. Estado de flujo y energía máxima",
+            q2: "2. Valor fundamental no negociable",
+            q3: "3. Logro trascendental al final de la vida",
+            q4: "4. Impulso primario sin limitaciones",
+            q5: "5. Fuente principal de incoherencia (Bloqueo)",
+            q6: "6. Creencia limitante ante el cambio",
+            q7: "7. Verbo de acción del propósito",
+            q8: "8. Abordaje natural de proyectos",
+            q9: "9. Reacción ante obstáculos",
+            q10: "10. Aprendizaje del fracaso",
+            q11: "11. Recarga de energía vital",
+            q12: "12. Impacto positivo deseado"
+        };
+
+        const OPCIONES_TEXTO = {
+            q1: {a:"a) Resolviendo problemas/datos", b:"b) Creando algo nuevo/artístico", c:"c) Conectando/enseñando", d:"d) Organizando/planificando", e:"e) En movimiento/explorando", f:"f) En calma/reflexionando"},
+            q2: {a:"a) Libertad", b:"b) Seguridad/Orden", c:"c) Crecimiento/Aprendizaje", d:"d) Conexión/Relaciones", e:"e) Integridad/Honestidad", f:"f) Impacto/Trascendencia"},
+            q3: {a:"a) Relaciones de amor", b:"b) Maestría y reconocimiento", c:"c) Obra o patrimonio tangible", d:"d) Aventuras y libertad", e:"e) Ayuda social/Problemas resueltos", f:"f) Paz interior y sabiduría"},
+            q4: {a:"a) Crear/Arte/Inventar", b:"b) Explorar el mundo", c:"c) Ayudar/Servir", d:"d) Aprender/Investigar", e:"e) Construir/Emprender", f:"f) Sanar/Equilibrio"},
+            q5: {a:"a) Expectativas familiares", b:"b) Presión social/éxito", c:"c) Perfeccionismo/Miedo", d:"d) Procrastinación", e:"e) Cansancio/Falta energía", f:"f) Duda sobre capacidad"},
+            q6: {a:"a) Falta de dinero/tiempo", b:"b) Ya es muy tarde", c:"c) Necesidad de plan perfecto", d:"d) Miedo terrible al fracaso", e:"e) Otros son mejores", f:"f) Egoísmo vs Responsabilidad"},
+            q7: {a:"a) Inspirar", b:"b) Crear", c:"c) Sanar", d:"d) Organizar", e:"e) Conectar", f:"f) Descubrir"},
+            q8: {a:"a) Planificar meticulosamente", b:"b) Lanzarse y experimentar", c:"c) Colaborar con otros", d:"d) Investigar a fondo primero", e:"e) Pequeños prototipos", f:"f) Reflexión interna previa"},
+            q9: {a:"a) Análisis lógico", b:"b) Ruta creativa no convencional", c:"c) Pedir consejo/ayuda", d:"d) Reflexión/Aprendizaje", e:"e) Frustración como motor", f:"f) Re-evaluar objetivo"},
+            q10:{a:"a) Descubrir fortaleza oculta", b:"b) Flexibilidad/Adaptación", c:"c) Valorar apoyos reales", d:"d) Claridad sobre lo que NO quiero", e:"e) Soy más resiliente", f:"f) Habilidad práctica nueva"},
+            q11:{a:"a) Calma/Silencio/Naturaleza", b:"b) Conexión social/Amigos", c:"c) Expresión creativa", d:"d) Movimiento/Deporte", e:"e) Estimulación intelectual", f:"f) Servicio/Ser útil"},
+            q12:{a:"a) Ejemplo de autenticidad", b:"b) Crear oportunidades", c:"c) Ambiente de alegría/amor", d:"d) Compartir sabiduría", e:"e) Dejar obra útil", f:"f) Aliviar sufrimiento/Sanar"}
+        };
+
         document.addEventListener('DOMContentLoaded', async () => {
             const urlParams = new URLSearchParams(window.location.search);
             const id = urlParams.get('id');
+            const coleccion = urlParams.get('coleccion') || 'reportes-personales';
 
             if (!id) {
-                alert("ID de reporte no especificado.");
-                window.location.href = 'portal.html';
+                document.getElementById('loading-state').innerHTML = `<p class="text-red-500 font-bold">Error: No se especificó un ID de reporte.</p>`;
                 return;
             }
 
             try {
-                // CONSUMO DE API SEGURA (Requiere cookie de terapeuta)
-                const response = await fetch(`/api/get-reporte-individual?id=${id}`);
+                // LLAMADA A API SEGURA MULTIFUENTE
+                const response = await fetch(`/api/get-reporte-individual?id=${id}&coleccion=${coleccion}`);
                 
                 if (response.status === 401) {
                     window.location.href = 'terapeuta-login.html';
                     return;
                 }
 
-                if (!response.ok) throw new Error('Error cargando el reporte');
+                if (!response.ok) throw new Error("Error cargando reporte");
 
-                const data = await response.json();
-                renderizarReporte(data);
+                const reporte = await response.json();
+                renderizarTodo(reporte);
+
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('report-content').classList.remove('hidden');
+                document.getElementById('badgeColeccion').innerText = reporte.coleccion;
 
             } catch (error) {
                 console.error(error);
-                document.getElementById('loading').innerHTML = `<p class="text-red-500">Error: No se pudo cargar el expediente.</p>`;
+                document.getElementById('loading-state').innerHTML = `<p class="text-red-500 font-bold">Error: No se pudo conectar con el expediente.</p>`;
             }
         });
 
-        function renderizarReporte(data) {
-            document.getElementById('loading').classList.add('hidden');
-            document.getElementById('report-content').classList.remove('hidden');
+        function renderizarTodo(reporte) {
+            const demo = reporte.demograficos;
+            const res = reporte.respuestas;
 
-            const demo = data.demograficos || {};
+            // 1. Datos del Paciente
+            document.getElementById('nombrePaciente').innerText = demo.nombre;
+            document.getElementById('fechaReporte').innerText = reporte.fechaLegible || reporte.fecha || 'Sin fecha';
+
+            const demoGrid = document.getElementById('demographics-grid');
+            const campos = {
+                edad: "Edad", profesion: "Ocupación", pais: "País", 
+                nivel_educativo: "Nivel Educativo", situacion_laboral: "Laboral", 
+                situacion_sentimental: "Relacional", hijos: "Hijos", mascotas: "Mascotas"
+            };
             
-            // Llenar campos de texto
-            setText('nombrePaciente', demo.nombre);
-            setText('fechaReporte', data.fechaLegible || new Date().toLocaleDateString());
-            setText('edad', (demo.edad || '--') + ' años');
-            setText('profesion', demo.profesion);
-            setText('pais', demo.pais);
-            setText('educacion', demo.nivel_educativo);
-            setText('estadoCivil', demo.situacion_sentimental); // Mapeo de nombre de campo según index.html
-            setText('hijos', demo.hijos);
-            setText('mascotas', demo.mascotas);
-            setText('arquetipo', data.arquetipoDominante);
+            demoGrid.innerHTML = Object.entries(campos).map(([key, label]) => `
+                <div class="mb-4">
+                    <p class="label-admin">${label}</p>
+                    <p class="value-admin">${demo[key] || '---'}</p>
+                </div>
+            `).join('');
 
-            // Renderizar Gráfico
-            if (data.resultados) {
-                const ctx = document.getElementById('radarChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'radar',
-                    data: {
-                        labels: Object.keys(data.resultados),
-                        datasets: [{
-                            label: 'Puntaje',
-                            data: Object.values(data.resultados),
-                            backgroundColor: 'rgba(232, 166, 19, 0.5)',
-                            borderColor: '#E8A613',
-                            borderWidth: 3,
-                            pointBackgroundColor: '#070404',
-                            pointBorderColor: '#fff',
-                            pointHoverBackgroundColor: '#fff',
-                            pointHoverBorderColor: '#E8A613',
-                            pointRadius: 5
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            r: {
-                                angleLines: { color: 'rgba(0,0,0,0.05)' },
-                                grid: { color: 'rgba(0,0,0,0.05)' },
-                                pointLabels: {
-                                    font: { family: "'Poppins', sans-serif", size: 12, weight: '600' },
-                                    color: '#374151'
-                                },
-                                ticks: { display: false, stepSize: 2 },
-                                suggestedMin: 0,
-                                suggestedMax: 10
-                            }
-                        },
-                        plugins: {
-                            legend: { display: false }
-                        }
-                    }
-                });
+            // 2. Cálculos Arquetípicos
+            const scores = { a: 0, b: 0, c: 0, d: 0, e: 0, f: 0 };
+            Object.values(res).forEach(val => { if(scores.hasOwnProperty(val)) scores[val]++; });
+            
+            const sorted = Object.entries(scores).sort(([,a],[,b]) => b-a);
+            const p = ARQUETIPOS_DATA[sorted[0][0]];
+            const s = ARQUETIPOS_DATA[sorted[1][0]];
+            const t = ARQUETIPOS_DATA[sorted[2][0]];
+
+            document.getElementById('arquetipoDominante').innerText = p.nombre;
+            document.getElementById('arquetipoDesc').innerText = p.desc;
+
+            // 3. Radar Chart
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: Object.values(ARQUETIPOS_DATA).map(a => a.nombre.split(' / ')[0]),
+                    datasets: [{
+                        label: 'Intensidad',
+                        data: Object.keys(ARQUETIPOS_DATA).map(k => scores[k]),
+                        backgroundColor: 'rgba(232, 166, 19, 0.4)',
+                        borderColor: '#E8A613',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#070404',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    scales: { r: { suggestedMin: 0, suggestedMax: 6, ticks: { display: false } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // 4. Triada
+            const triadaDiv = document.getElementById('triada-container');
+            const items = [
+                { title: "1. Primario", info: p, score: sorted[0][1], color: "bg-yellow-50 border-[#E8A613]" },
+                { title: "2. Secundario", info: s, score: sorted[1][1], color: "bg-gray-50 border-gray-400" },
+                { title: "3. Terciario", info: t, score: sorted[2][1], color: "bg-gray-50 border-gray-200" }
+            ];
+            
+            triadaDiv.innerHTML = items.map(item => `
+                <div class="p-4 border-l-4 ${item.color} rounded-r-lg">
+                    <p class="text-[10px] font-black uppercase text-gray-400">${item.title}</p>
+                    <h4 class="font-bold text-sm text-[#070404]">${item.info.nombre}</h4>
+                    <p class="text-[10px] text-gray-500 mt-1">${item.score} puntos asignados</p>
+                </div>
+            `).join('');
+
+            // 5. Fórmulas de Síntesis
+            const formulasDiv = document.getElementById('formulas-container');
+            formulasDiv.innerHTML = `
+                <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 italic text-sm">
+                    1. "${p.verbo} ${s.contexto} para ${t.impacto}."
+                </div>
+                <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 italic text-sm">
+                    2. "${p.verbo} ${t.contexto} para ${s.impacto}."
+                </div>
+            `;
+
+            // 6. Bloqueos
+            const blockersGrid = document.getElementById('blockers-grid');
+            blockersGrid.innerHTML = `
+                <div class="p-4 bg-white border border-red-100 rounded-xl">
+                    <p class="label-admin !text-red-400">Incoherencia Vital</p>
+                    <p class="text-sm font-medium text-red-900">${OPCIONES_TEXTO.q5[res.q5] || 'Sin definir'}</p>
+                </div>
+                <div class="p-4 bg-white border border-red-100 rounded-xl">
+                    <p class="label-admin !text-red-400">Creencia Raíz</p>
+                    <p class="text-sm font-medium text-red-900">${OPCIONES_TEXTO.q6[res.q6] || 'Sin definir'}</p>
+                </div>
+            `;
+
+            // 7. Bitácora de respuestas
+            const answersDiv = document.getElementById('respuestas-full');
+            let htmlAnswers = "";
+            for(let i=1; i<=12; i++) {
+                const qKey = `q${i}`;
+                htmlAnswers += `
+                    <div class="py-4">
+                        <p class="text-xs font-bold text-[#E8A613] mb-1 uppercase tracking-tighter">${PREGUNTAS_TEXTO[qKey]}</p>
+                        <p class="text-sm text-[#070404]">${OPCIONES_TEXTO[qKey][res[qKey]] || 'Respuesta no registrada'}</p>
+                    </div>
+                `;
             }
-        }
-
-        function setText(id, value) {
-            const el = document.getElementById(id);
-            if (el) el.textContent = value || '---';
+            answersDiv.innerHTML = htmlAnswers;
         }
     </script>
 </body>
